@@ -1,0 +1,15 @@
+{
+  "bootstrap_servers": "kafka-1.prod.example.com:9092,kafka-2.prod.example.com:9092,kafka-3.prod.example.com:9092",
+  "security_protocol": "SASL_SSL",
+  "sasl_mechanism": "PLAIN",
+  "sasl_username": "${KAFKA_USERNAME}",
+  "sasl_password": "${KAFKA_PASSWORD}",
+  "consumer_group": "sparkle-prod",
+  "properties": {
+    "session.timeout.ms": "30000",
+    "enable.auto.commit": "false",
+    "auto.offset.reset": "earliest",
+    "max.poll.records": "500",
+    "fetch.min.bytes": "1048576"
+  }
+}

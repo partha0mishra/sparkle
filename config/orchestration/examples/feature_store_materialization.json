@@ -1,0 +1,67 @@
+{
+  "pipeline_name": "feature_store_customer_features",
+  "pipeline_type": "feature_store_daily_materialization",
+  "env": "prod",
+
+  "source_system": "gold",
+  "source_tables": [
+    "main.gold.customer_daily_metrics",
+    "main.gold.customer_behavior",
+    "main.gold.customer_transactions"
+  ],
+
+  "destination_catalog": "${CATALOG:main}",
+  "destination_schema": "${SCHEMA:feature_store}",
+  "destination_table": "customer_features",
+
+  "primary_key": ["customer_id"],
+  "watermark_column": "feature_timestamp",
+
+  "feature_columns": [
+    "customer_id",
+    "total_orders",
+    "avg_order_value",
+    "days_since_last_order",
+    "lifetime_value",
+    "customer_segment",
+    "churn_score",
+    "recency",
+    "frequency",
+    "monetary",
+    "engagement_score"
+  ],
+
+  "write_mode": "overwrite",
+
+  "schedule": "0 5 * * *",
+  "dependencies": [
+    "gold_customer_aggregate",
+    "gold_customer_behavior_metrics"
+  ],
+
+  "tags": {
+    "team": "ml-engineering",
+    "domain": "customer",
+    "layer": "feature_store",
+    "ml_use_case": "churn_prediction",
+    "criticality": "high"
+  },
+
+  "extra_config": {
+    "feature_store_config": {
+      "online_store_enabled": true,
+      "online_store_type": "redis",
+      "online_store_ttl_hours": 24,
+      "point_in_time_joins": true
+    },
+    "feature_engineering": {
+      "aggregation_windows": [7, 30, 90, 365],
+      "lag_features": [1, 7, 30],
+      "rolling_stats": ["mean", "std", "min", "max"]
+    },
+    "versioning": {
+      "track_feature_versions": true,
+      "feature_version": "v2"
+    }
+  }
+}

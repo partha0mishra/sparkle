@@ -1,0 +1,13 @@
+{
+  "base_path": "s3a://my-lakehouse-prod",
+  "aws_region": "us-east-1",
+  "auth_type": "iam_role",
+  "properties": {
+    "fs.s3a.endpoint": "s3.us-east-1.amazonaws.com",
+    "fs.s3a.impl": "org.apache.hadoop.fs.s3a.S3AFileSystem",
+    "fs.s3a.connection.ssl.enabled": "true",
+    "fs.s3a.fast.upload": "true",
+    "fs.s3a.multipart.size": "104857600",
+    "fs.s3a.block.size": "134217728"
+  }
+}

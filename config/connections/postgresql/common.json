@@ -1,0 +1,11 @@
+{
+  "driver": "org.postgresql.Driver",
+  "properties": {
+    "fetchsize": "10000",
+    "batchsize": "10000",
+    "queryTimeout": "300",
+    "ssl": "true",
+    "sslmode": "require",
+    "ApplicationName": "SparkleETL"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "catalog": "spark_catalog",
+  "base_path": "s3a://my-lakehouse-prod/delta",
+  "properties": {
+    "delta.autoOptimize.autoCompact": "true",
+    "delta.autoOptimize.optimizeWrite": "true",
+    "delta.enableChangeDataFeed": "true",
+    "delta.deletedFileRetentionDuration": "interval 7 days",
+    "delta.logRetentionDuration": "interval 30 days"
+  }
+}

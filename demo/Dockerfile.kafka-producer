@@ -1,0 +1,15 @@
+# Dockerfile for Kafka event producer (streaming data generator)
+
+FROM python:3.10-slim
+
+WORKDIR /demo
+
+# Install dependencies
+RUN pip install --no-cache-dir \
+    kafka-python==2.0.2 \
+    faker==21.0.0
+
+# Copy demo scripts
+COPY demo/ /demo/
+
+CMD ["python", "/demo/kafka_event_generator.py"]

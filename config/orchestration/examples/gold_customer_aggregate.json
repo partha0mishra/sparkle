@@ -1,0 +1,61 @@
+{
+  "pipeline_name": "gold_customer_aggregate",
+  "pipeline_type": "gold_daily_aggregate",
+  "env": "prod",
+
+  "source_system": "silver",
+  "source_table": "main.silver.customers",
+
+  "destination_catalog": "${CATALOG:main}",
+  "destination_schema": "${SCHEMA:gold}",
+  "destination_table": "customer_daily_metrics",
+
+  "partition_columns": ["metric_date"],
+
+  "write_mode": "overwrite",
+
+  "schedule": "0 4 * * *",
+  "dependencies": ["silver_customer_transformation"],
+
+  "tags": {
+    "team": "analytics",
+    "domain": "customer",
+    "layer": "gold",
+    "use_case": "reporting",
+    "criticality": "medium"
+  },
+
+  "extra_config": {
+    "aggregations": {
+      "group_by": ["registration_date", "customer_segment", "country"],
+      "measures": [
+        {
+          "name": "total_customers",
+          "expression": "count(distinct customer_id)"
+        },
+        {
+          "name": "new_customers",
+          "expression": "count(distinct case when registration_date = current_date then customer_id end)"
+        },
+        {
+          "name": "active_customers",
+          "expression": "count(distinct case when last_activity_date >= current_date - interval 30 days then customer_id end)"
+        },
+        {
+          "name": "avg_lifetime_value",
+          "expression": "avg(lifetime_value)"
+        },
+        {
+          "name": "avg_order_count",
+          "expression": "avg(order_count)"
+        }
+      ]
+    },
+    "filters": {
+      "exclude_test_customers": true,
+      "min_registration_date": "2020-01-01"
+    },
+    "zorder_columns": ["customer_segment", "country"],
+    "optimize_on_write": true
+  }
+}

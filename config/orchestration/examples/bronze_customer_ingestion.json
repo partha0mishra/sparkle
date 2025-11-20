@@ -1,0 +1,44 @@
+{
+  "pipeline_name": "bronze_customer_ingestion",
+  "pipeline_type": "bronze_raw_ingestion",
+  "env": "prod",
+
+  "source_system": "postgres_crm",
+  "source_connection": "postgres_prod",
+  "source_table": "public.customers",
+
+  "ingestor": "jdbc_postgres",
+
+  "destination_catalog": "${CATALOG:main}",
+  "destination_schema": "${SCHEMA:bronze}",
+  "destination_table": "customers_raw",
+
+  "partition_columns": ["ingestion_date"],
+  "watermark_column": "updated_at",
+
+  "write_mode": "append",
+
+  "schedule": "0 */2 * * *",
+
+  "tags": {
+    "team": "data-engineering",
+    "domain": "customer",
+    "source": "crm",
+    "layer": "bronze",
+    "criticality": "high"
+  },
+
+  "alert_channels": [
+    "slack://data-eng-alerts",
+    "email://data-team@company.com"
+  ],
+
+  "extra_config": {
+    "jdbc_options": {
+      "numPartitions": 10,
+      "fetchSize": 10000
+    },
+    "retention_days": 90,
+    "add_provenance": true
+  }
+}

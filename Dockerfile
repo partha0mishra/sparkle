@@ -1,14 +1,12 @@
 # Dockerfile for Sparkle Framework
-# Based on Apache Spark 3.5 with Delta Lake, MLflow, and all dependencies
+# Based on Apache Spark 3.5.0 with Delta Lake, MLflow, and all dependencies
 
-FROM bitnami/spark:3.5
+FROM apache/spark-py:v3.5.0
 
 USER root
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
-    python3-pip \
-    python3-dev \
     build-essential \
     git \
     curl \
@@ -20,8 +18,7 @@ RUN pip3 install --upgrade pip setuptools wheel
 
 # Install Delta Lake
 RUN pip3 install \
-    delta-spark==2.4.0 \
-    pyspark==3.5.0
+    delta-spark==2.4.0
 
 # Install ML dependencies
 RUN pip3 install \
@@ -79,19 +76,9 @@ COPY . /opt/sparkle/
 
 # Set Python path
 ENV PYTHONPATH="${PYTHONPATH}:/opt/sparkle"
-ENV SPARK_HOME=/opt/bitnami/spark
-
-# Configure Spark for Delta Lake
-ENV SPARK_CONF_DIR=/opt/bitnami/spark/conf
-RUN echo "spark.sql.extensions=io.delta.sql.DeltaSparkSessionExtension" >> $SPARK_CONF_DIR/spark-defaults.conf && \
-    echo "spark.sql.catalog.spark_catalog=org.apache.spark.sql.delta.catalog.DeltaCatalog" >> $SPARK_CONF_DIR/spark-defaults.conf
+ENV SPARK_HOME=/opt/spark
 
 # Create data directories
 RUN mkdir -p /opt/spark-data/bronze /opt/spark-data/silver /opt/spark-data/gold /opt/spark-data/ml
-
-# Set permissions
-RUN chown -R 1001:1001 /opt/sparkle /opt/spark-data
-
-USER 1001
 
 CMD ["bash"]

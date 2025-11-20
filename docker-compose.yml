@@ -3,15 +3,12 @@ version: '3.8'
 services:
   # Spark Master
   spark-master:
-    image: bitnami/spark:3.5
+    image: apache/spark-py:v3.5.0
     container_name: sparkle-spark-master
+    hostname: spark-master
+    command: /opt/spark/sbin/start-master.sh && tail -f /opt/spark/logs/*
     environment:
-      - SPARK_MODE=master
-      - SPARK_RPC_AUTHENTICATION_ENABLED=no
-      - SPARK_RPC_ENCRYPTION_ENABLED=no
-      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
-      - SPARK_SSL_ENABLED=no
-      - SPARK_MASTER_WEBUI_PORT=8080
+      - SPARK_NO_DAEMONIZE=true
     ports:
       - "8080:8080"  # Spark Master Web UI
       - "7077:7077"  # Spark Master
@@ -23,17 +20,13 @@ services:
 
   # Spark Worker 1
   spark-worker-1:
-    image: bitnami/spark:3.5
+    image: apache/spark-py:v3.5.0
     container_name: sparkle-spark-worker-1
+    command: /opt/spark/sbin/start-worker.sh spark://spark-master:7077 && tail -f /opt/spark/logs/*
     environment:
-      - SPARK_MODE=worker
-      - SPARK_MASTER_URL=spark://spark-master:7077
       - SPARK_WORKER_MEMORY=2G
       - SPARK_WORKER_CORES=2
-      - SPARK_RPC_AUTHENTICATION_ENABLED=no
-      - SPARK_RPC_ENCRYPTION_ENABLED=no
-      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
-      - SPARK_SSL_ENABLED=no
+      - SPARK_NO_DAEMONIZE=true
     depends_on:
       - spark-master
     volumes:
@@ -44,17 +37,13 @@ services:
 
   # Spark Worker 2
   spark-worker-2:
-    image: bitnami/spark:3.5
+    image: apache/spark-py:v3.5.0
     container_name: sparkle-spark-worker-2
+    command: /opt/spark/sbin/start-worker.sh spark://spark-master:7077 && tail -f /opt/spark/logs/*
     environment:
-      - SPARK_MODE=worker
-      - SPARK_MASTER_URL=spark://spark-master:7077
       - SPARK_WORKER_MEMORY=2G
       - SPARK_WORKER_CORES=2
-      - SPARK_RPC_AUTHENTICATION_ENABLED=no
-      - SPARK_RPC_ENCRYPTION_ENABLED=no
-      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
-      - SPARK_SSL_ENABLED=no
+      - SPARK_NO_DAEMONIZE=true
     depends_on:
       - spark-master
     volumes:
@@ -203,20 +192,12 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-      kafka:
-        condition: service_healthy
-      minio:
-        condition: service_healthy
     environment:
       POSTGRES_HOST: postgres
       POSTGRES_PORT: 5432
       POSTGRES_DB: sparkle_crm
       POSTGRES_USER: sparkle
       POSTGRES_PASSWORD: sparkle123
-      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
-      MINIO_ENDPOINT: minio:9000
-      MINIO_ACCESS_KEY: minioadmin
-      MINIO_SECRET_KEY: minioadmin
     volumes:
       - ./demo:/demo
     networks:
@@ -275,44 +256,6 @@ services:
     networks:
       - sparkle-network
     command: streamlit run /demo/streamlit_app.py --server.port=8501 --server.address=0.0.0.0
-
-  # Spark Submit (for running demo pipeline)
-  spark-submit:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: sparkle-spark-submit
-    depends_on:
-      - spark-master
-      - init-db
-    environment:
-      SPARK_MASTER_URL: spark://spark-master:7077
-      POSTGRES_HOST: postgres
-      POSTGRES_PORT: 5432
-      POSTGRES_DB: sparkle_crm
-      POSTGRES_USER: sparkle
-      POSTGRES_PASSWORD: sparkle123
-      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
-      MINIO_ENDPOINT: minio:9000
-      MINIO_ACCESS_KEY: minioadmin
-      MINIO_SECRET_KEY: minioadmin
-    volumes:
-      - ./:/opt/sparkle
-      - spark-data:/opt/spark-data
-    networks:
-      - sparkle-network
-    profiles:
-      - manual  # Don't start automatically
-    command: >
-      spark-submit
-      --master spark://spark-master:7077
-      --deploy-mode client
-      --conf spark.sql.extensions=io.delta.sql.DeltaSparkSessionExtension
-      --conf spark.sql.catalog.spark_catalog=org.apache.spark.sql.delta.catalog.DeltaCatalog
-      --packages io.delta:delta-core_2.12:2.4.0
-      /opt/sparkle/demo/run_full_pipeline.py
 
 networks:
   sparkle-network:

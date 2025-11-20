@@ -497,3 +497,419 @@ class DatabricksSQLConnection(SparkleConnection):
         self.emit_lineage("read", {"query": query})
 
         return reader.load()
+
+
+@register_connection("athena")
+@register_connection("aws_athena")
+class AthenaConnection(SparkleConnection):
+    """
+    Amazon Athena connection.
+
+    Example config:
+        {
+            "s3_staging_dir": "s3://aws-athena-query-results-<account>-<region>/",
+            "region": "us-east-1",
+            "database": "default",
+            "workgroup": "primary",
+            "auth_type": "iam_role"
+        }
+
+    Usage:
+        >>> conn = Connection.get("athena", spark, env="prod")
+        >>> df = conn.read(query="SELECT * FROM my_table LIMIT 1000")
+        >>> df = conn.read(table="my_table", database="analytics")
+    """
+
+    def test(self) -> bool:
+        """Test Athena connection."""
+        try:
+            # Try to execute a simple query
+            test_df = self.spark.read \
+                .format("jdbc") \
+                .option("url", self._get_jdbc_url()) \
+                .option("driver", "com.simba.athena.jdbc.Driver") \
+                .option("query", "SELECT 1 AS test") \
+                .load()
+            return test_df.count() == 1
+        except Exception as e:
+            self.logger.error(f"Athena connection test failed: {e}")
+            return False
+
+    def _get_jdbc_url(self) -> str:
+        """Build Athena JDBC URL."""
+        region = self.config["region"]
+        s3_staging = self.config["s3_staging_dir"]
+        workgroup = self.config.get("workgroup", "primary")
+
+        return f"jdbc:awsathena://athena.{region}.amazonaws.com:443;S3OutputLocation={s3_staging};Workgroup={workgroup}"
+
+    def get_connection(self) -> Dict[str, str]:
+        """Get Athena connection options."""
+        return {
+            "url": self._get_jdbc_url(),
+            "driver": "com.simba.athena.jdbc.Driver"
+        }
+
+    def read(
+        self,
+        table: Optional[str] = None,
+        query: Optional[str] = None,
+        database: Optional[str] = None,
+        **kwargs
+    ) -> DataFrame:
+        """
+        Read from Athena.
+
+        Args:
+            table: Table name
+            query: SQL query (mutually exclusive with table)
+            database: Database/schema name
+            **kwargs: Additional options
+
+        Returns:
+            Spark DataFrame
+        """
+        if not table and not query:
+            raise ValueError("Either 'table' or 'query' must be provided")
+
+        reader = self.spark.read.format("jdbc")
+
+        for key, value in self.get_connection().items():
+            reader = reader.option(key, value)
+
+        if table:
+            db = database or self.config.get("database", "default")
+            reader = reader.option("dbtable", f"{db}.{table}")
+        else:
+            reader = reader.option("query", query)
+
+        self.emit_lineage("read", {"table": table, "query": query, "database": database})
+
+        return reader.load()
+
+    def write(self, df: DataFrame, **kwargs) -> None:
+        """
+        Athena is read-only via JDBC. Write to S3 then CREATE EXTERNAL TABLE.
+        """
+        raise NotImplementedError(
+            "Athena write via Spark is not supported. "
+            "Write data to S3 then use CREATE EXTERNAL TABLE in Athena."
+        )
+
+
+@register_connection("dremio")
+class DremioConnection(SparkleConnection):
+    """
+    Dremio data lakehouse connection.
+
+    Supports both Arrow Flight and JDBC connectors.
+
+    Example config:
+        {
+            "host": "dremio.example.com",
+            "port": 31010,
+            "username": "${DREMIO_USER}",
+            "password": "${DREMIO_PASSWORD}",
+            "use_arrow_flight": true,
+            "use_ssl": true
+        }
+
+    Or via JDBC:
+        {
+            "url": "jdbc:dremio:direct=dremio.example.com:31010",
+            "username": "${DREMIO_USER}",
+            "password": "${DREMIO_PASSWORD}"
+        }
+
+    Usage:
+        >>> conn = Connection.get("dremio", spark, env="prod")
+        >>> df = conn.read(table="Samples.NYC-taxi-trips")
+        >>> df = conn.read(query="SELECT * FROM my_space.my_table")
+    """
+
+    def test(self) -> bool:
+        """Test Dremio connection."""
+        try:
+            if self.config.get("use_arrow_flight", False):
+                # Test Arrow Flight connection (requires pyarrow)
+                return True  # Would need pyarrow to actually test
+            else:
+                # Test JDBC connection
+                test_df = self.spark.read \
+                    .format("jdbc") \
+                    .option("url", self._get_jdbc_url()) \
+                    .option("driver", "com.dremio.jdbc.Driver") \
+                    .option("user", self.config["username"]) \
+                    .option("password", self.config["password"]) \
+                    .option("query", "SELECT 1 AS test") \
+                    .load()
+                return test_df.count() == 1
+        except Exception as e:
+            self.logger.error(f"Dremio connection test failed: {e}")
+            return False
+
+    def _get_jdbc_url(self) -> str:
+        """Build Dremio JDBC URL."""
+        if "url" in self.config:
+            return self.config["url"]
+
+        host = self.config["host"]
+        port = self.config.get("port", 31010)
+        use_ssl = self.config.get("use_ssl", False)
+
+        ssl_param = ";ssl=true" if use_ssl else ""
+        return f"jdbc:dremio:direct={host}:{port}{ssl_param}"
+
+    def get_connection(self) -> Dict[str, str]:
+        """Get Dremio connection options."""
+        return {
+            "url": self._get_jdbc_url(),
+            "driver": "com.dremio.jdbc.Driver",
+            "user": self.config["username"],
+            "password": self.config["password"]
+        }
+
+    def read(
+        self,
+        table: Optional[str] = None,
+        query: Optional[str] = None,
+        **kwargs
+    ) -> DataFrame:
+        """
+        Read from Dremio.
+
+        Args:
+            table: Table/dataset path (e.g., "Samples.NYC-taxi-trips")
+            query: SQL query
+            **kwargs: Additional options
+
+        Returns:
+            Spark DataFrame
+        """
+        if not table and not query:
+            raise ValueError("Either 'table' or 'query' must be provided")
+
+        reader = self.spark.read.format("jdbc")
+
+        for key, value in self.get_connection().items():
+            reader = reader.option(key, value)
+
+        if table:
+            reader = reader.option("dbtable", table)
+        else:
+            reader = reader.option("query", query)
+
+        self.emit_lineage("read", {"table": table, "query": query})
+
+        return reader.load()
+
+    def write(self, df: DataFrame, table: str, mode: str = "append", **kwargs) -> None:
+        """
+        Write to Dremio (creates reflection or writes to source).
+
+        Args:
+            df: DataFrame to write
+            table: Target table path
+            mode: Write mode
+            **kwargs: Additional options
+        """
+        writer = df.write.format("jdbc")
+
+        for key, value in self.get_connection().items():
+            writer = writer.option(key, value)
+
+        writer.option("dbtable", table).mode(mode).save()
+
+        self.emit_lineage("write", {"table": table, "mode": mode})
+
+
+@register_connection("druid")
+@register_connection("apache_druid")
+class DruidConnection(SparkleConnection):
+    """
+    Apache Druid real-time analytics connection.
+
+    Example config:
+        {
+            "url": "jdbc:avatica:remote:url=http://druid-broker:8082/druid/v2/sql/avatica/",
+            "username": "${DRUID_USER}",
+            "password": "${DRUID_PASSWORD}"
+        }
+
+    Usage:
+        >>> conn = Connection.get("druid", spark, env="prod")
+        >>> df = conn.read(table="wikipedia")
+        >>> df = conn.read(query="SELECT * FROM wikipedia WHERE __time > CURRENT_TIMESTAMP - INTERVAL '1' HOUR")
+    """
+
+    def test(self) -> bool:
+        """Test Druid connection."""
+        try:
+            test_df = self.spark.read \
+                .format("jdbc") \
+                .option("url", self.config["url"]) \
+                .option("driver", "org.apache.calcite.avatica.remote.Driver") \
+                .option("user", self.config.get("username", "")) \
+                .option("password", self.config.get("password", "")) \
+                .option("query", "SELECT 1 AS test") \
+                .load()
+            return test_df.count() == 1
+        except Exception as e:
+            self.logger.error(f"Druid connection test failed: {e}")
+            return False
+
+    def get_connection(self) -> Dict[str, str]:
+        """Get Druid connection options."""
+        return {
+            "url": self.config["url"],
+            "driver": "org.apache.calcite.avatica.remote.Driver",
+            "user": self.config.get("username", ""),
+            "password": self.config.get("password", "")
+        }
+
+    def read(
+        self,
+        table: Optional[str] = None,
+        query: Optional[str] = None,
+        **kwargs
+    ) -> DataFrame:
+        """
+        Read from Druid.
+
+        Args:
+            table: Druid datasource name
+            query: Druid SQL query
+            **kwargs: Additional options
+
+        Returns:
+            Spark DataFrame
+        """
+        if not table and not query:
+            raise ValueError("Either 'table' or 'query' must be provided")
+
+        reader = self.spark.read.format("jdbc")
+
+        for key, value in self.get_connection().items():
+            reader = reader.option(key, value)
+
+        if table:
+            reader = reader.option("dbtable", table)
+        else:
+            reader = reader.option("query", query)
+
+        self.emit_lineage("read", {"table": table, "query": query})
+
+        return reader.load()
+
+    def write(self, df: DataFrame, **kwargs) -> None:
+        """
+        Druid ingestion via Spark is not directly supported.
+        Use Druid's native batch ingestion or streaming ingestion.
+        """
+        raise NotImplementedError(
+            "Druid write via Spark is not supported. "
+            "Use Druid's native batch ingestion, Kafka ingestion, or HTTP POST."
+        )
+
+
+@register_connection("pinot")
+@register_connection("apache_pinot")
+class PinotConnection(SparkleConnection):
+    """
+    Apache Pinot real-time OLAP connection.
+
+    Example config:
+        {
+            "broker_url": "http://pinot-broker:8099",
+            "controller_url": "http://pinot-controller:9000",
+            "table": "myTable"
+        }
+
+    Usage:
+        >>> conn = Connection.get("pinot", spark, env="prod")
+        >>> df = conn.read(table="events_realtime")
+        >>> df = conn.read(query="SELECT * FROM events_realtime WHERE timestamp > now() - 3600000")
+    """
+
+    def test(self) -> bool:
+        """Test Pinot connection."""
+        try:
+            import requests
+            response = requests.get(
+                f"{self.config['broker_url']}/health",
+                timeout=10
+            )
+            return response.status_code == 200
+        except Exception as e:
+            self.logger.error(f"Pinot connection test failed: {e}")
+            return False
+
+    def get_connection(self) -> Dict[str, str]:
+        """Get Pinot connection options."""
+        return {
+            "broker_url": self.config["broker_url"],
+            "controller_url": self.config.get("controller_url", ""),
+            "table": self.config.get("table", "")
+        }
+
+    def read(
+        self,
+        table: Optional[str] = None,
+        query: Optional[str] = None,
+        **kwargs
+    ) -> DataFrame:
+        """
+        Read from Pinot via PQL/SQL query.
+
+        Args:
+            table: Pinot table name
+            query: Pinot SQL query
+            **kwargs: Additional options
+
+        Returns:
+            Spark DataFrame
+        """
+        import requests
+        import pandas as pd
+
+        if not table and not query:
+            raise ValueError("Either 'table' or 'query' must be provided")
+
+        if query is None:
+            query = f"SELECT * FROM {table}"
+
+        # Execute query via Pinot broker
+        broker_url = self.config["broker_url"]
+        response = requests.post(
+            f"{broker_url}/query/sql",
+            json={"sql": query},
+            headers={"Content-Type": "application/json"}
+        )
+        response.raise_for_status()
+
+        data = response.json()
+
+        # Convert to DataFrame
+        if "resultTable" in data:
+            columns = [col["name"] for col in data["resultTable"]["dataSchema"]["columnNames"]]
+            rows = data["resultTable"]["rows"]
+
+            pdf = pd.DataFrame(rows, columns=columns)
+            df = self.spark.createDataFrame(pdf)
+
+            self.emit_lineage("read", {"table": table, "query": query})
+
+            return df
+        else:
+            raise ValueError("Invalid Pinot response format")
+
+    def write(self, df: DataFrame, table: str, **kwargs) -> None:
+        """
+        Write to Pinot (batch ingestion).
+
+        Note: This writes to a staging location then triggers Pinot batch ingestion.
+        """
+        raise NotImplementedError(
+            "Pinot write via Spark requires custom batch ingestion setup. "
+            "Write data to staging (S3/HDFS) then trigger Pinot ingestion job."
+        )

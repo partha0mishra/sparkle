@@ -1,22 +1,24 @@
 """
 Sparkle Connections Layer
 
-78+ production-ready, config-driven connection factories for:
-- JDBC databases (PostgreSQL, MySQL, Oracle, SQL Server, etc.)
-- Cloud storage (S3, ADLS, GCS, HDFS)
-- Streaming (Kafka, Kinesis, Event Hubs, Pub/Sub, Pulsar)
-- Data warehouses (Snowflake, Redshift, BigQuery, Synapse)
-- NoSQL (MongoDB, Cassandra, DynamoDB, CosmosDB, Elasticsearch)
-- APIs (REST, GraphQL, SOAP, gRPC)
+82+ production-ready, config-driven connection factories for:
+- Cloud storage (S3, ADLS, GCS, HDFS, Databricks Volumes, Cloudflare R2, Wasabi, Backblaze B2)
+- Lakehouse formats (Delta Lake, Iceberg, Hudi)
+- JDBC databases (PostgreSQL, MySQL, Oracle, SQL Server, Teradata, DB2, SAP HANA, etc.)
+- Data warehouses (Snowflake, Redshift, BigQuery, Synapse, Athena, Dremio, Druid, Pinot)
+- NoSQL (MongoDB, Cassandra, DynamoDB, CosmosDB, Elasticsearch, Neo4j, Redis, Couchbase)
+- SaaS platforms (Salesforce, Netsuite, Workday, ServiceNow, HubSpot, Shopify, Stripe, etc.)
+- Streaming (Kafka, Kinesis, Event Hubs, Pub/Sub, Pulsar, RabbitMQ, MQTT, NATS)
+- REST & GraphQL APIs (Generic REST, GraphQL with OAuth2)
+- Mainframe/Legacy (IBM i, EBCDIC/VSAM, SAP ODP, SAP Datasphere, Oracle EBS, PeopleSoft)
+- Industry protocols (HL7/FHIR, X12 EDI, FIX, SWIFT, AWS HealthLake)
 - Catalogs (Unity Catalog, Hive, Glue, Purview)
 - ML platforms (MLflow, SageMaker, Vertex AI, Azure ML)
-- File formats (Delta, Iceberg, Hudi, Parquet)
-- Specialized (SFTP, FTP, SMTP, Salesforce, SAP, Slack)
 
 Usage:
-    >>> from sparkle.connections import get_connection
-    >>> conn = get_connection("postgres", spark, env="prod")
-    >>> df = conn.read_table("customers")
+    >>> from sparkle.connections import Connection
+    >>> conn = Connection.get("postgres", spark, env="prod")
+    >>> df = conn.read(table="customers")
 
     >>> from sparkle.connections import ConnectionFactory
     >>> available = ConnectionFactory.list_available()
@@ -34,6 +36,7 @@ from .base import (
 
 from .factory import (
     ConnectionFactory,
+    Connection,
     get_connection,
     register_connection
 )
@@ -70,7 +73,11 @@ from .cloud_storage import (
     GCSConnection,
     HDFSConnection,
     LocalFileSystemConnection,
-    S3CompatibleConnection
+    S3CompatibleConnection,
+    DatabricksVolumesConnection,
+    CloudflareR2Connection,
+    WasabiConnection,
+    BackblazeB2Connection
 )
 
 # Streaming
@@ -82,7 +89,9 @@ from .streaming import (
     PulsarConnection,
     RabbitMQConnection,
     SQSConnection,
-    ServiceBusConnection
+    ServiceBusConnection,
+    MQTTConnection,
+    NATSJetStreamConnection
 )
 
 # Data warehouses
@@ -91,7 +100,11 @@ from .data_warehouses import (
     RedshiftConnection,
     BigQueryConnection,
     SynapseConnection,
-    DatabricksSQLConnection
+    DatabricksSQLConnection,
+    AthenaConnection,
+    DremioConnection,
+    DruidConnection,
+    PinotConnection
 )
 
 # NoSQL
@@ -160,6 +173,45 @@ from .specialized import (
     SlackConnection
 )
 
+# SaaS Platforms
+from .saas_platforms import (
+    SalesforceCDCConnection,
+    NetsuiteConnection,
+    WorkdayPrismConnection,
+    ServiceNowConnection,
+    MarketoConnection,
+    HubSpotConnection,
+    ZendeskConnection,
+    ShopifyConnection,
+    StripeConnection,
+    ZuoraConnection,
+    GoogleAnalytics4Connection,
+    GoogleAdsConnection,
+    FacebookAdsConnection,
+    LinkedInAdsConnection,
+    AmplitudeConnection,
+    SegmentConnection
+)
+
+# Mainframe & Legacy Systems
+from .mainframe_legacy import (
+    IBMiConnection,
+    MainframeEBCDICConnection,
+    SAPODPConnection,
+    SAPDatasphereConnection,
+    OracleEBSConnection,
+    PeopleSoftConnection
+)
+
+# Industry-Specific Protocols
+from .industry_protocols import (
+    FHIRConnection,
+    X12EDIConnection,
+    FIXProtocolConnection,
+    SWIFTConnection,
+    AWSHealthLakeConnection
+)
+
 
 __all__ = [
     # Core
@@ -169,6 +221,7 @@ __all__ = [
     "StreamingConnection",
     "APIConnection",
     "ConnectionFactory",
+    "Connection",
     "get_connection",
     "register_connection",
     "ConfigLoader",
@@ -199,6 +252,10 @@ __all__ = [
     "HDFSConnection",
     "LocalFileSystemConnection",
     "S3CompatibleConnection",
+    "DatabricksVolumesConnection",
+    "CloudflareR2Connection",
+    "WasabiConnection",
+    "BackblazeB2Connection",
 
     # Streaming
     "KafkaConnection",
@@ -209,6 +266,8 @@ __all__ = [
     "RabbitMQConnection",
     "SQSConnection",
     "ServiceBusConnection",
+    "MQTTConnection",
+    "NATSJetStreamConnection",
 
     # Data Warehouses
     "SnowflakeConnection",
@@ -216,6 +275,10 @@ __all__ = [
     "BigQueryConnection",
     "SynapseConnection",
     "DatabricksSQLConnection",
+    "AthenaConnection",
+    "DremioConnection",
+    "DruidConnection",
+    "PinotConnection",
 
     # NoSQL
     "MongoDBConnection",
@@ -270,6 +333,39 @@ __all__ = [
     "SAPConnection",
     "JiraConnection",
     "SlackConnection",
+
+    # SaaS Platforms
+    "SalesforceCDCConnection",
+    "NetsuiteConnection",
+    "WorkdayPrismConnection",
+    "ServiceNowConnection",
+    "MarketoConnection",
+    "HubSpotConnection",
+    "ZendeskConnection",
+    "ShopifyConnection",
+    "StripeConnection",
+    "ZuoraConnection",
+    "GoogleAnalytics4Connection",
+    "GoogleAdsConnection",
+    "FacebookAdsConnection",
+    "LinkedInAdsConnection",
+    "AmplitudeConnection",
+    "SegmentConnection",
+
+    # Mainframe & Legacy
+    "IBMiConnection",
+    "MainframeEBCDICConnection",
+    "SAPODPConnection",
+    "SAPDatasphereConnection",
+    "OracleEBSConnection",
+    "PeopleSoftConnection",
+
+    # Industry Protocols
+    "FHIRConnection",
+    "X12EDIConnection",
+    "FIXProtocolConnection",
+    "SWIFTConnection",
+    "AWSHealthLakeConnection",
 ]
 
 

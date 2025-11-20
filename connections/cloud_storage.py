@@ -404,3 +404,165 @@ class S3CompatibleConnection(CloudStorageConnection):
     def get_connection(self) -> str:
         """Return base path."""
         return self.get_base_path()
+
+
+@register_connection("databricks_volumes")
+@register_connection("dbfs")
+@register_connection("unity_volumes")
+class DatabricksVolumesConnection(CloudStorageConnection):
+    """
+    Databricks Volumes (Unity Catalog) and DBFS connection.
+
+    Supports:
+    - Unity Catalog Volumes (/Volumes/catalog/schema/volume/)
+    - DBFS (dbfs:/)
+    - Local file system in Databricks (file:/)
+
+    Example config:
+        {
+            "base_path": "/Volumes/main/default/landing",
+            "catalog": "main",
+            "schema": "default",
+            "volume": "landing"
+        }
+
+    Or for DBFS:
+        {
+            "base_path": "dbfs:/mnt/data"
+        }
+
+    Usage:
+        >>> conn = Connection.get("databricks_volumes", spark, env="prod")
+        >>> df = conn.read(path="raw/customers/", format="parquet")
+        >>> conn.write(df, path="processed/customers/", format="delta")
+    """
+
+    def test(self) -> bool:
+        """Test Databricks Volumes/DBFS connection."""
+        try:
+            base_path = self.get_base_path()
+
+            # Try dbutils first (Databricks environment)
+            try:
+                from pyspark.dbutils import DBUtils
+                dbutils = DBUtils(self.spark)
+                dbutils.fs.ls(base_path)
+                return True
+            except:
+                # Fallback: try Spark file listing
+                files = self.spark.sparkContext._jvm.org.apache.hadoop.fs.FileSystem \
+                    .get(self.spark.sparkContext._jsc.hadoopConfiguration()) \
+                    .listStatus(self.spark.sparkContext._jvm.org.apache.hadoop.fs.Path(base_path))
+                return True
+        except Exception as e:
+            self.logger.error(f"Databricks Volumes connection test failed: {e}")
+            return False
+
+    def get_connection(self) -> str:
+        """Return base path."""
+        return self.get_base_path()
+
+    def create_volume(
+        self,
+        catalog: str,
+        schema: str,
+        volume: str,
+        volume_type: str = "MANAGED",
+        location: Optional[str] = None
+    ) -> None:
+        """
+        Create Unity Catalog Volume.
+
+        Args:
+            catalog: Catalog name
+            schema: Schema name
+            volume: Volume name
+            volume_type: MANAGED or EXTERNAL
+            location: External location (for EXTERNAL volumes)
+        """
+        if volume_type == "EXTERNAL" and not location:
+            raise ValueError("EXTERNAL volumes require location parameter")
+
+        if volume_type == "MANAGED":
+            sql = f"CREATE VOLUME IF NOT EXISTS {catalog}.{schema}.{volume}"
+        else:
+            sql = f"CREATE EXTERNAL VOLUME IF NOT EXISTS {catalog}.{schema}.{volume} LOCATION '{location}'"
+
+        self.spark.sql(sql)
+        self.logger.info(f"Created volume: {catalog}.{schema}.{volume}")
+
+    def list_volumes(self, catalog: str, schema: str) -> list:
+        """List volumes in a schema."""
+        result = self.spark.sql(f"SHOW VOLUMES IN {catalog}.{schema}").collect()
+        return [row.volume_name for row in result]
+
+
+@register_connection("cloudflare_r2")
+@register_connection("r2")
+class CloudflareR2Connection(S3CompatibleConnection):
+    """
+    Cloudflare R2 connection (S3-compatible).
+
+    Example config:
+        {
+            "base_path": "s3a://my-r2-bucket",
+            "endpoint": "https://<account-id>.r2.cloudflarestorage.com",
+            "access_key": "${R2_ACCESS_KEY}",
+            "secret_key": "${R2_SECRET_KEY}",
+            "properties": {
+                "fs.s3a.path.style.access": "true"
+            }
+        }
+
+    Usage:
+        >>> conn = Connection.get("r2", spark, env="prod")
+        >>> df = conn.read(path="data/", format="parquet")
+    """
+    pass
+
+
+@register_connection("wasabi")
+class WasabiConnection(S3CompatibleConnection):
+    """
+    Wasabi Cloud Storage connection (S3-compatible).
+
+    Example config:
+        {
+            "base_path": "s3a://my-wasabi-bucket",
+            "endpoint": "https://s3.wasabisys.com",
+            "access_key": "${WASABI_ACCESS_KEY}",
+            "secret_key": "${WASABI_SECRET_KEY}",
+            "properties": {
+                "fs.s3a.path.style.access": "true"
+            }
+        }
+
+    Usage:
+        >>> conn = Connection.get("wasabi", spark, env="prod")
+        >>> df = conn.read(path="archive/", format="parquet")
+    """
+    pass
+
+
+@register_connection("backblaze_b2")
+@register_connection("b2")
+class BackblazeB2Connection(S3CompatibleConnection):
+    """
+    Backblaze B2 connection (S3-compatible).
+
+    Example config:
+        {
+            "base_path": "s3a://my-b2-bucket",
+            "endpoint": "https://s3.us-west-001.backblazeb2.com",
+            "access_key": "${B2_ACCESS_KEY}",
+            "secret_key": "${B2_SECRET_KEY}",
+            "properties": {
+                "fs.s3a.path.style.access": "true"
+            }
+        }
+
+    Usage:
+        >>> conn = Connection.get("b2", spark, env="prod")
+        >>> df = conn.read(path="backups/", format="delta")
+    """
+    pass

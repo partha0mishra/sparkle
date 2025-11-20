@@ -26,7 +26,7 @@ class BiasFairnessAuditor(BaseMLComponent):
             "prediction_column": "prediction",
             "fairness_metrics": ["demographic_parity", "equalized_odds"],
             "output_table": "audit.fairness_metrics"
-        }
+        }`
     """
 
     def execute(self) -> Dict[str, Any]:

@@ -1,0 +1,325 @@
+version: '3.8'
+
+services:
+  # Spark Master
+  spark-master:
+    image: bitnami/spark:3.5.0
+    container_name: sparkle-spark-master
+    environment:
+      - SPARK_MODE=master
+      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+      - SPARK_RPC_ENCRYPTION_ENABLED=no
+      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+      - SPARK_SSL_ENABLED=no
+      - SPARK_MASTER_WEBUI_PORT=8080
+    ports:
+      - "8080:8080"  # Spark Master Web UI
+      - "7077:7077"  # Spark Master
+    volumes:
+      - ./:/opt/sparkle
+      - spark-data:/opt/spark-data
+    networks:
+      - sparkle-network
+
+  # Spark Worker 1
+  spark-worker-1:
+    image: bitnami/spark:3.5.0
+    container_name: sparkle-spark-worker-1
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark-master:7077
+      - SPARK_WORKER_MEMORY=2G
+      - SPARK_WORKER_CORES=2
+      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+      - SPARK_RPC_ENCRYPTION_ENABLED=no
+      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+      - SPARK_SSL_ENABLED=no
+    depends_on:
+      - spark-master
+    volumes:
+      - ./:/opt/sparkle
+      - spark-data:/opt/spark-data
+    networks:
+      - sparkle-network
+
+  # Spark Worker 2
+  spark-worker-2:
+    image: bitnami/spark:3.5.0
+    container_name: sparkle-spark-worker-2
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark-master:7077
+      - SPARK_WORKER_MEMORY=2G
+      - SPARK_WORKER_CORES=2
+      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+      - SPARK_RPC_ENCRYPTION_ENABLED=no
+      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+      - SPARK_SSL_ENABLED=no
+    depends_on:
+      - spark-master
+    volumes:
+      - ./:/opt/sparkle
+      - spark-data:/opt/spark-data
+    networks:
+      - sparkle-network
+
+  # PostgreSQL Database (Sample CRM data)
+  postgres:
+    image: postgres:15-alpine
+    container_name: sparkle-postgres
+    environment:
+      POSTGRES_DB: sparkle_crm
+      POSTGRES_USER: sparkle
+      POSTGRES_PASSWORD: sparkle123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./demo/init-db/postgres:/docker-entrypoint-initdb.d
+    networks:
+      - sparkle-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sparkle"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Zookeeper (for Kafka)
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: sparkle-zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    networks:
+      - sparkle-network
+
+  # Kafka
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: sparkle-kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    networks:
+      - sparkle-network
+    healthcheck:
+      test: ["CMD", "kafka-topics", "--bootstrap-server", "localhost:9092", "--list"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+
+  # Schema Registry (for Kafka)
+  schema-registry:
+    image: confluentinc/cp-schema-registry:7.5.0
+    container_name: sparkle-schema-registry
+    depends_on:
+      - kafka
+    ports:
+      - "8081:8081"
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: kafka:29092
+      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
+    networks:
+      - sparkle-network
+
+  # MinIO (S3-compatible storage)
+  minio:
+    image: minio/minio:latest
+    container_name: sparkle-minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio-data:/data
+    networks:
+      - sparkle-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # MinIO Client (for bucket setup)
+  minio-mc:
+    image: minio/mc:latest
+    container_name: sparkle-minio-mc
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      sleep 5;
+      /usr/bin/mc config host add myminio http://minio:9000 minioadmin minioadmin;
+      /usr/bin/mc mb myminio/sparkle-data --ignore-existing;
+      /usr/bin/mc mb myminio/salesforce-exports --ignore-existing;
+      /usr/bin/mc mb myminio/ga4-exports --ignore-existing;
+      /usr/bin/mc mb myminio/mainframe-data --ignore-existing;
+      /usr/bin/mc policy set download myminio/sparkle-data;
+      /usr/bin/mc policy set download myminio/salesforce-exports;
+      exit 0;
+      "
+    networks:
+      - sparkle-network
+
+  # Redis (Online Feature Store)
+  redis:
+    image: redis:7-alpine
+    container_name: sparkle-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - sparkle-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Init DB Service (loads sample data)
+  init-db:
+    build:
+      context: .
+      dockerfile: demo/Dockerfile.init-db
+    container_name: sparkle-init-db
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: sparkle_crm
+      POSTGRES_USER: sparkle
+      POSTGRES_PASSWORD: sparkle123
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      MINIO_ENDPOINT: minio:9000
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+    volumes:
+      - ./demo:/demo
+    networks:
+      - sparkle-network
+    command: python /demo/load_sample_data.py
+
+  # Kafka Producer (streaming data generator)
+  kafka-producer:
+    build:
+      context: .
+      dockerfile: demo/Dockerfile.kafka-producer
+    container_name: sparkle-kafka-producer
+    depends_on:
+      kafka:
+        condition: service_healthy
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      KAFKA_TOPIC: customer-events
+      EVENTS_PER_SECOND: 10
+    volumes:
+      - ./demo:/demo
+    networks:
+      - sparkle-network
+    command: python /demo/kafka_event_generator.py
+
+  # Streamlit Demo Dashboard
+  streamlit-demo:
+    build:
+      context: .
+      dockerfile: demo/Dockerfile.streamlit
+    container_name: sparkle-streamlit
+    depends_on:
+      - spark-master
+      - postgres
+      - kafka
+      - redis
+      - minio
+    ports:
+      - "8501:8501"
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: sparkle_crm
+      POSTGRES_USER: sparkle
+      POSTGRES_PASSWORD: sparkle123
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      MINIO_ENDPOINT: minio:9000
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+      SPARK_MASTER_URL: spark://spark-master:7077
+    volumes:
+      - ./:/opt/sparkle
+      - ./demo:/demo
+    networks:
+      - sparkle-network
+    command: streamlit run /demo/streamlit_app.py --server.port=8501 --server.address=0.0.0.0
+
+  # Spark Submit (for running demo pipeline)
+  spark-submit:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sparkle-spark-submit
+    depends_on:
+      - spark-master
+      - init-db
+    environment:
+      SPARK_MASTER_URL: spark://spark-master:7077
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: sparkle_crm
+      POSTGRES_USER: sparkle
+      POSTGRES_PASSWORD: sparkle123
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      MINIO_ENDPOINT: minio:9000
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+    volumes:
+      - ./:/opt/sparkle
+      - spark-data:/opt/spark-data
+    networks:
+      - sparkle-network
+    profiles:
+      - manual  # Don't start automatically
+    command: >
+      spark-submit
+      --master spark://spark-master:7077
+      --deploy-mode client
+      --conf spark.sql.extensions=io.delta.sql.DeltaSparkSessionExtension
+      --conf spark.sql.catalog.spark_catalog=org.apache.spark.sql.delta.catalog.DeltaCatalog
+      --packages io.delta:delta-core_2.12:2.4.0
+      /opt/sparkle/demo/run_full_pipeline.py
+
+networks:
+  sparkle-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  minio-data:
+  redis-data:
+  spark-data:

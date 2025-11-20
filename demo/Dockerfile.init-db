@@ -1,0 +1,18 @@
+# Dockerfile for database initialization service
+
+FROM python:3.10-slim
+
+WORKDIR /demo
+
+# Install dependencies
+RUN pip install --no-cache-dir \
+    psycopg2-binary==2.9.9 \
+    kafka-python==2.0.2 \
+    boto3==1.34.8 \
+    faker==21.0.0 \
+    minio==7.2.0
+
+# Copy demo scripts
+COPY demo/ /demo/
+
+CMD ["python", "/demo/load_sample_data.py"]

@@ -1,18 +1,21 @@
 """
-API endpoints for component management.
+API endpoints for component management (Phase 2 - Enhanced).
+Automatic component discovery with JSON Schema generation.
 """
-from fastapi import APIRouter, HTTPException, Depends
-from typing import Any
+from fastapi import APIRouter, HTTPException, Depends, Query
+from typing import Optional
 
 from core.dependencies import get_current_active_user
 from core.security import User
 from schemas.response import APIResponse
 from schemas.component import (
     ComponentListResponse,
-    ComponentDetail,
-    ComponentCategoriesResponse,
+    ComponentDetailResponse,
     ComponentValidationRequest,
     ComponentValidationResponse,
+    ComponentSearchResponse,
+    ComponentMetadata,
+    ComponentSampleDataResponse,
 )
 from services.component_service import component_service
 
@@ -21,58 +24,60 @@ router = APIRouter(prefix="/components", tags=["components"])
 
 
 @router.get("", response_model=APIResponse[ComponentListResponse])
-async def list_components(
+async def list_all_components(
     current_user: User = Depends(get_current_active_user),
 ):
     """
-    Get list of all available Sparkle components.
-    Components are grouped by type: ingestors, transformers, ml, connections.
+    Get all available Sparkle components grouped by category.
+    Includes full config schemas for each component.
     """
     try:
         components = component_service.get_all_components()
         return APIResponse(
             success=True,
             data=components,
-            message="Components retrieved successfully",
+            message=f"Retrieved {components.total_count} components",
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/categories", response_model=APIResponse[ComponentCategoriesResponse])
-async def get_component_categories(
+@router.get("/category/{category}", response_model=APIResponse[list[ComponentMetadata]])
+async def list_components_by_category(
+    category: str,
     current_user: User = Depends(get_current_active_user),
 ):
     """
-    Get components grouped by categories for UI sidebar.
+    Get components filtered by category.
+    Categories: connection, ingestor, transformer, ml, sink
     """
     try:
-        categories = component_service.get_categories()
+        components = component_service.get_components_by_category(category)
         return APIResponse(
             success=True,
-            data=categories,
-            message="Categories retrieved successfully",
+            data=components,
+            message=f"Retrieved {len(components)} components in category '{category}'",
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/{component_type}/{component_name}", response_model=APIResponse[ComponentDetail])
-async def get_component(
-    component_type: str,
-    component_name: str,
+@router.get("/{category}/{name}", response_model=APIResponse[ComponentDetailResponse])
+async def get_component_detail(
+    category: str,
+    name: str,
     current_user: User = Depends(get_current_active_user),
 ):
     """
     Get detailed information about a specific component.
-    Includes metadata, JSON Schema for config, and example config.
+    Includes full JSON Schema for configuration and sample config.
     """
     try:
-        component = component_service.get_component(component_type, component_name)
+        component = component_service.get_component(category, name)
         if component is None:
             raise HTTPException(
                 status_code=404,
-                detail=f"Component not found: {component_type}/{component_name}",
+                detail=f"Component not found: {category}/{name}",
             )
 
         return APIResponse(
@@ -87,28 +92,79 @@ async def get_component(
 
 
 @router.post(
-    "/{component_type}/{component_name}/validate",
+    "/{category}/{name}/validate",
     response_model=APIResponse[ComponentValidationResponse],
 )
 async def validate_component_config(
-    component_type: str,
-    component_name: str,
+    category: str,
+    name: str,
     request: ComponentValidationRequest,
     current_user: User = Depends(get_current_active_user),
 ):
     """
     Validate component configuration against its JSON Schema.
-    Returns validation errors and warnings.
+    Returns detailed field-level errors with paths.
     """
     try:
-        validation = component_service.validate_config(
-            component_type, component_name, request.config
-        )
+        validation = component_service.validate_config(category, name, request.config)
 
         return APIResponse(
             success=validation.valid,
             data=validation,
             message="Validation completed" if validation.valid else "Validation failed",
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/search", response_model=APIResponse[ComponentSearchResponse])
+async def search_components(
+    q: str = Query(..., description="Search query"),
+    current_user: User = Depends(get_current_active_user),
+):
+    """
+    Search components by name, description, or tags.
+    Returns ranked results with relevance scores.
+
+    Example: /api/v1/components/search?q=salesforce
+    """
+    try:
+        results = component_service.search_components(q)
+        return APIResponse(
+            success=True,
+            data=results,
+            message=f"Found {results.total_results} matching components",
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get(
+    "/{category}/{name}/sample-data",
+    response_model=APIResponse[ComponentSampleDataResponse],
+)
+async def get_component_sample_data(
+    category: str,
+    name: str,
+    sample_size: int = Query(10, ge=1, le=100, description="Number of sample rows"),
+    current_user: User = Depends(get_current_active_user),
+):
+    """
+    Execute component with sample config and return sample data.
+    Used for Live Preview in Phase 5.
+
+    Returns:
+    - Sample data rows
+    - Schema information
+    - Execution time
+    """
+    try:
+        result = component_service.get_sample_data(category, name, sample_size)
+        return APIResponse(
+            success=result.success,
+            data=result,
+            message="Sample data generated" if result.success else "Failed to generate sample data",
+            error=result.error,
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

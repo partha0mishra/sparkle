@@ -1,315 +1,366 @@
 """
-Service for discovering and managing Sparkle components.
-Scans sparkle/ packages to build component registry with JSON Schema.
+Service for managing Sparkle components (Phase 2 - Real Implementation).
+Uses ComponentRegistry for automatic component discovery and JSON Schema generation.
 """
-import importlib
-import inspect
-import pkgutil
-import sys
-from pathlib import Path
-from typing import Any, Optional
-from functools import lru_cache
+import time
+from typing import Optional
+from jsonschema import validate, ValidationError, Draft7Validator
 
-from core.config import settings
+from component_registry import get_registry, ComponentCategory, ComponentManifest
+from core.dependencies import get_spark
 from schemas.component import (
+    ComponentManifestSchema,
     ComponentMetadata,
-    ComponentSchema,
-    ComponentDetail,
     ComponentListResponse,
-    ComponentCategory,
-    ComponentCategoriesResponse,
+    ComponentGroup,
+    ComponentDetailResponse,
     ComponentValidationResponse,
+    FieldError,
+    ComponentSearchResponse,
+    ComponentSearchResult,
+    ComponentSampleDataResponse,
 )
-from utils.schema_generator import generate_schema_from_class, extract_config_class
 
 
 class ComponentService:
-    """Service for managing Sparkle components."""
+    """Service for managing Sparkle components with registry integration."""
 
     def __init__(self):
-        self.sparkle_path = Path(settings.SPARKLE_ENGINE_PATH)
-        self._registry: dict[str, dict[str, ComponentSchema]] = {
-            "ingestors": {},
-            "transformers": {},
-            "ml": {},
-            "connections": {},
-        }
-        self._initialized = False
-
-    def initialize(self):
-        """Initialize component registry by scanning sparkle packages."""
-        if self._initialized:
-            return
-
-        # Add sparkle path to sys.path if not already there
-        if str(self.sparkle_path) not in sys.path:
-            sys.path.insert(0, str(self.sparkle_path))
-
-        # Scan each component type
-        self._scan_components("ingestors", "sparkle.ingestors")
-        self._scan_components("transformers", "sparkle.transformers")
-        self._scan_components("ml", "sparkle.ml")
-        self._scan_components("connections", "sparkle.connections")
-
-        self._initialized = True
-
-    def _scan_components(self, component_type: str, package_name: str):
-        """Scan a package for components."""
-        try:
-            package = importlib.import_module(package_name)
-        except (ImportError, ModuleNotFoundError):
-            # Package doesn't exist, skip
-            return
-
-        # Iterate through all modules in package
-        if hasattr(package, "__path__"):
-            for importer, modname, ispkg in pkgutil.iter_modules(package.__path__):
-                if modname.startswith("_"):
-                    continue
-
-                try:
-                    module_name = f"{package_name}.{modname}"
-                    module = importlib.import_module(module_name)
-
-                    # Extract component metadata
-                    component_schema = self._extract_component_schema(
-                        module, component_type, modname
-                    )
-                    if component_schema:
-                        self._registry[component_type][modname] = component_schema
-
-                except Exception as e:
-                    # Log error but continue
-                    print(f"Error loading component {modname}: {e}")
-
-    def _extract_component_schema(
-        self, module: Any, component_type: str, module_name: str
-    ) -> Optional[ComponentSchema]:
-        """Extract component schema from module."""
-        # Find the main class (usually named after the module or has run/execute method)
-        main_class = None
-        for name, obj in inspect.getmembers(module, inspect.isclass):
-            if obj.__module__ == module.__name__:
-                # Look for classes with run, execute, or transform methods
-                if hasattr(obj, "run") or hasattr(obj, "execute") or hasattr(obj, "transform"):
-                    main_class = obj
-                    break
-
-        if not main_class:
-            return None
-
-        # Extract metadata
-        metadata = ComponentMetadata(
-            name=module_name,
-            type=component_type,
-            category=self._get_category(component_type, module_name),
-            description=self._extract_description(main_class),
-            version=getattr(module, "__version__", "1.0.0"),
-            tags=self._extract_tags(main_class),
-        )
-
-        # Extract config schema
-        config_class = extract_config_class(module)
-        if config_class:
-            config_schema = generate_schema_from_class(config_class)
-        else:
-            # No config class found, generate empty schema
-            config_schema = {"type": "object", "properties": {}}
-
-        # Extract example config
-        example_config = None
-        if hasattr(module, "EXAMPLE_CONFIG"):
-            example_config = module.EXAMPLE_CONFIG
-        elif hasattr(main_class, "EXAMPLE_CONFIG"):
-            example_config = main_class.EXAMPLE_CONFIG
-
-        return ComponentSchema(
-            metadata=metadata,
-            config_schema=config_schema,
-            example_config=example_config,
-        )
-
-    def _get_category(self, component_type: str, module_name: str) -> str:
-        """Determine component category."""
-        # Category mappings based on naming patterns
-        categories = {
-            "ingestors": {
-                "postgres": "Database",
-                "mysql": "Database",
-                "mongodb": "Database",
-                "s3": "Cloud Storage",
-                "gcs": "Cloud Storage",
-                "azure": "Cloud Storage",
-                "csv": "File",
-                "json": "File",
-                "parquet": "File",
-                "api": "API",
-                "kafka": "Streaming",
-            },
-            "transformers": {
-                "filter": "Data Quality",
-                "deduplicate": "Data Quality",
-                "validate": "Data Quality",
-                "aggregate": "Aggregation",
-                "join": "Join",
-                "pivot": "Reshape",
-                "unpivot": "Reshape",
-            },
-            "ml": {
-                "regression": "Regression",
-                "classification": "Classification",
-                "clustering": "Clustering",
-                "feature": "Feature Engineering",
-            },
-            "connections": {
-                "postgres": "Database",
-                "mysql": "Database",
-                "s3": "Cloud Storage",
-            },
-        }
-
-        type_categories = categories.get(component_type, {})
-        for keyword, category in type_categories.items():
-            if keyword in module_name.lower():
-                return category
-
-        return component_type.title()
-
-    def _extract_description(self, cls: type) -> Optional[str]:
-        """Extract description from class docstring."""
-        if cls.__doc__:
-            return cls.__doc__.strip().split("\n")[0]
-        return None
-
-    def _extract_tags(self, cls: type) -> list[str]:
-        """Extract tags from class."""
-        tags = []
-        if hasattr(cls, "TAGS"):
-            tags = cls.TAGS
-        return tags
+        self._registry = get_registry()
 
     def get_all_components(self) -> ComponentListResponse:
-        """Get all components grouped by type."""
-        self.initialize()
+        """
+        Get all components grouped by category.
+        Returns full manifests with config schemas.
+        """
+        all_components = self._registry.get_all()
+        groups = []
+        total_count = 0
 
-        response = ComponentListResponse(
-            ingestors=[c.metadata for c in self._registry["ingestors"].values()],
-            transformers=[c.metadata for c in self._registry["transformers"].values()],
-            ml=[c.metadata for c in self._registry["ml"].values()],
-            connections=[c.metadata for c in self._registry["connections"].values()],
+        # Build groups for each category
+        for category, components_dict in all_components.items():
+            if not components_dict:
+                continue
+
+            # Convert manifests to metadata
+            component_metadata_list = [
+                self._manifest_to_metadata(manifest)
+                for manifest in components_dict.values()
+            ]
+
+            group = ComponentGroup(
+                category=category.value,
+                display_name=self._category_display_name(category),
+                icon=self._category_icon(category),
+                count=len(component_metadata_list),
+                components=component_metadata_list,
+            )
+            groups.append(group)
+            total_count += len(component_metadata_list)
+
+        # Get stats
+        stats = self._registry.get_stats()
+
+        return ComponentListResponse(
+            groups=groups,
+            total_count=total_count,
+            stats=stats,
         )
-        response.total_count = (
-            len(response.ingestors)
-            + len(response.transformers)
-            + len(response.ml)
-            + len(response.connections)
-        )
-        return response
 
-    def get_component(self, component_type: str, component_name: str) -> Optional[ComponentDetail]:
-        """Get detailed component information."""
-        self.initialize()
-
-        if component_type not in self._registry:
+    def get_component(
+        self, category: str, name: str
+    ) -> Optional[ComponentDetailResponse]:
+        """Get detailed component information with full config schema."""
+        try:
+            cat_enum = ComponentCategory(category)
+        except ValueError:
             return None
 
-        component_schema = self._registry[component_type].get(component_name)
-        if not component_schema:
+        manifest = self._registry.get_component(cat_enum, name)
+        if not manifest:
             return None
 
-        return ComponentDetail(
-            metadata=component_schema.metadata,
-            config_schema=component_schema.config_schema,
-            example_config=component_schema.example_config,
-        )
+        # Convert manifest to schema
+        manifest_schema = self._manifest_to_schema(manifest)
 
-    def get_categories(self) -> ComponentCategoriesResponse:
-        """Get components grouped by categories."""
-        self.initialize()
+        return ComponentDetailResponse(component=manifest_schema)
 
-        categories_map: dict[str, ComponentCategory] = {}
+    def get_components_by_category(self, category: str) -> list[ComponentMetadata]:
+        """Get all components in a specific category."""
+        try:
+            cat_enum = ComponentCategory(category)
+        except ValueError:
+            return []
 
-        for component_type, components in self._registry.items():
-            for component_schema in components.values():
-                category_name = component_schema.metadata.category
-                if category_name not in categories_map:
-                    categories_map[category_name] = ComponentCategory(
-                        name=category_name.lower().replace(" ", "_"),
-                        display_name=category_name,
-                        components=[],
-                    )
-                categories_map[category_name].components.append(component_schema.metadata)
-
-        return ComponentCategoriesResponse(
-            categories=list(categories_map.values())
-        )
+        components_dict = self._registry.get_by_category(cat_enum)
+        return [
+            self._manifest_to_metadata(manifest)
+            for manifest in components_dict.values()
+        ]
 
     def validate_config(
-        self, component_type: str, component_name: str, config: dict[str, Any]
+        self, category: str, name: str, config: dict
     ) -> ComponentValidationResponse:
-        """Validate component configuration against schema."""
-        self.initialize()
-
-        if component_type not in self._registry:
+        """
+        Validate component configuration against its JSON Schema.
+        Returns detailed field-level errors.
+        """
+        try:
+            cat_enum = ComponentCategory(category)
+        except ValueError:
             return ComponentValidationResponse(
-                valid=False, errors=[f"Invalid component type: {component_type}"]
+                valid=False,
+                errors=[
+                    FieldError(
+                        field="category",
+                        message=f"Invalid category: {category}",
+                        error_type="invalid",
+                    )
+                ],
             )
 
-        component_schema = self._registry[component_type].get(component_name)
-        if not component_schema:
+        manifest = self._registry.get_component(cat_enum, name)
+        if not manifest:
             return ComponentValidationResponse(
-                valid=False, errors=[f"Component not found: {component_name}"]
+                valid=False,
+                errors=[
+                    FieldError(
+                        field="component",
+                        message=f"Component not found: {category}/{name}",
+                        error_type="not_found",
+                    )
+                ],
             )
 
-        # Basic JSON Schema validation
+        # Validate against JSON Schema
+        schema = manifest.config_schema
+        if not schema:
+            # No schema defined - allow anything
+            return ComponentValidationResponse(valid=True)
+
         errors = []
         warnings = []
 
-        schema = component_schema.config_schema
-        required_fields = schema.get("required", [])
-        properties = schema.get("properties", {})
+        try:
+            # Create validator
+            validator = Draft7Validator(schema)
 
-        # Check required fields
-        for field in required_fields:
-            if field not in config:
-                errors.append(f"Missing required field: {field}")
+            # Validate
+            validation_errors = sorted(
+                validator.iter_errors(config), key=lambda e: e.path
+            )
 
-        # Check field types (basic validation)
-        for field, value in config.items():
-            if field in properties:
-                prop_schema = properties[field]
-                expected_type = prop_schema.get("type")
-                if expected_type:
-                    if not self._validate_type(value, expected_type):
-                        errors.append(
-                            f"Field '{field}' has invalid type. Expected: {expected_type}"
-                        )
+            for error in validation_errors:
+                # Build field path
+                field_path = ".".join(str(p) for p in error.path) if error.path else "root"
+
+                # Determine error type
+                error_type = error.validator
+
+                errors.append(
+                    FieldError(
+                        field=field_path,
+                        message=error.message,
+                        error_type=error_type,
+                    )
+                )
+
+        except Exception as e:
+            errors.append(
+                FieldError(
+                    field="validation",
+                    message=f"Schema validation error: {str(e)}",
+                    error_type="validation_error",
+                )
+            )
 
         return ComponentValidationResponse(
-            valid=len(errors) == 0,
-            errors=errors,
-            warnings=warnings,
+            valid=len(errors) == 0, errors=errors, warnings=warnings
         )
 
-    def _validate_type(self, value: Any, expected_type: str | list) -> bool:
-        """Basic type validation."""
-        if isinstance(expected_type, list):
-            return any(self._validate_type(value, t) for t in expected_type)
+    def search_components(self, query: str) -> ComponentSearchResponse:
+        """
+        Search components by name, description, or tags.
+        Returns ranked results with relevance scores.
+        """
+        manifests = self._registry.search(query)
 
-        type_map = {
-            "string": str,
-            "integer": int,
-            "number": (int, float),
-            "boolean": bool,
-            "array": list,
-            "object": dict,
-            "null": type(None),
+        # Build search results with relevance scoring
+        results = []
+        query_lower = query.lower()
+
+        for manifest in manifests:
+            score = 0.0
+            match_reason = "name"
+
+            # Name match (highest score)
+            if query_lower in manifest.name.lower():
+                score = 1.0
+                match_reason = "name"
+                # Exact match gets bonus
+                if query_lower == manifest.name.lower():
+                    score = 1.5
+
+            # Display name match
+            elif query_lower in manifest.display_name.lower():
+                score = 0.9
+                match_reason = "display_name"
+
+            # Description match
+            elif manifest.description and query_lower in manifest.description.lower():
+                score = 0.7
+                match_reason = "description"
+
+            # Tag match
+            elif any(query_lower in tag.lower() for tag in manifest.tags):
+                score = 0.8
+                match_reason = "tag"
+
+            results.append(
+                ComponentSearchResult(
+                    component=self._manifest_to_metadata(manifest),
+                    relevance_score=min(score, 1.0),  # Cap at 1.0
+                    match_reason=match_reason,
+                )
+            )
+
+        # Sort by relevance score
+        results.sort(key=lambda r: r.relevance_score, reverse=True)
+
+        return ComponentSearchResponse(
+            query=query, results=results, total_results=len(results)
+        )
+
+    def get_sample_data(
+        self, category: str, name: str, sample_size: int = 10
+    ) -> ComponentSampleDataResponse:
+        """
+        Execute component with sample config and return sample data.
+        Used for Live Preview (Phase 5).
+        """
+        try:
+            cat_enum = ComponentCategory(category)
+        except ValueError:
+            return ComponentSampleDataResponse(
+                component_name=f"{category}/{name}",
+                success=False,
+                error=f"Invalid category: {category}",
+            )
+
+        manifest = self._registry.get_component(cat_enum, name)
+        if not manifest:
+            return ComponentSampleDataResponse(
+                component_name=f"{category}/{name}",
+                success=False,
+                error=f"Component not found: {category}/{name}",
+            )
+
+        start_time = time.time()
+
+        try:
+            # Get sample config
+            config = manifest.sample_config
+            if not config:
+                return ComponentSampleDataResponse(
+                    component_name=name,
+                    success=False,
+                    error="No sample config available for this component",
+                )
+
+            # Execute component (placeholder for Phase 5)
+            # In Phase 5, this will actually run the component
+            spark = get_spark()
+
+            # For now, return mock data
+            sample_data = [
+                {
+                    "id": i,
+                    "name": f"Sample {i}",
+                    "value": f"Value {i}",
+                }
+                for i in range(sample_size)
+            ]
+
+            schema = {
+                "fields": [
+                    {"name": "id", "type": "integer"},
+                    {"name": "name", "type": "string"},
+                    {"name": "value", "type": "string"},
+                ]
+            }
+
+            execution_time = (time.time() - start_time) * 1000
+
+            return ComponentSampleDataResponse(
+                component_name=name,
+                sample_data=sample_data,
+                row_count=len(sample_data),
+                schema_=schema,
+                execution_time_ms=execution_time,
+                success=True,
+            )
+
+        except Exception as e:
+            execution_time = (time.time() - start_time) * 1000
+            return ComponentSampleDataResponse(
+                component_name=name,
+                execution_time_ms=execution_time,
+                success=False,
+                error=str(e),
+            )
+
+    def _manifest_to_schema(self, manifest: ComponentManifest) -> ComponentManifestSchema:
+        """Convert ComponentManifest to ComponentManifestSchema."""
+        return ComponentManifestSchema(
+            name=manifest.name,
+            category=manifest.category.value,
+            display_name=manifest.display_name,
+            description=manifest.description,
+            icon=manifest.icon,
+            tags=manifest.tags or [],
+            config_schema=manifest.config_schema or {},
+            sample_config=manifest.sample_config or {},
+            has_code_editor=manifest.has_code_editor,
+            is_streaming=manifest.is_streaming,
+            supports_incremental=manifest.supports_incremental,
+            module_path=manifest.module_path,
+            class_name=manifest.class_name,
+        )
+
+    def _manifest_to_metadata(self, manifest: ComponentManifest) -> ComponentMetadata:
+        """Convert ComponentManifest to ComponentMetadata."""
+        return ComponentMetadata(
+            name=manifest.name,
+            category=manifest.category.value,
+            display_name=manifest.display_name,
+            description=manifest.description,
+            icon=manifest.icon,
+            tags=manifest.tags or [],
+            is_streaming=manifest.is_streaming,
+            supports_incremental=manifest.supports_incremental,
+        )
+
+    def _category_display_name(self, category: ComponentCategory) -> str:
+        """Get display name for category."""
+        display_names = {
+            ComponentCategory.CONNECTION: "Connections",
+            ComponentCategory.INGESTOR: "Ingestors",
+            ComponentCategory.TRANSFORMER: "Transformers",
+            ComponentCategory.ML: "Machine Learning",
+            ComponentCategory.SINK: "Sinks",
         }
+        return display_names.get(category, category.value.title())
 
-        expected_py_type = type_map.get(expected_type)
-        if expected_py_type:
-            return isinstance(value, expected_py_type)
-        return True
+    def _category_icon(self, category: ComponentCategory) -> str:
+        """Get icon for category."""
+        icons = {
+            ComponentCategory.CONNECTION: "database",
+            ComponentCategory.INGESTOR: "download",
+            ComponentCategory.TRANSFORMER: "transform",
+            ComponentCategory.ML: "brain",
+            ComponentCategory.SINK: "upload",
+        }
+        return icons.get(category, "component")
 
 
 # Global component service instance

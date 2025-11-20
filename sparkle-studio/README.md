@@ -39,25 +39,37 @@ sparkle-studio/
 
 **Status: Complete**
 
-### Features
-
 - ✅ FastAPI app with CORS, middleware, lifespan management
-- ✅ Component discovery and JSON Schema generation
 - ✅ Pipeline CRUD operations with Git integration
 - ✅ Execution engine (dry-run, run, backfill)
 - ✅ Git operations (status, commit, pull, PR creation)
 - ✅ Full OpenAPI spec at `/docs` and `/redoc`
 - ✅ Type-safe with Pydantic v2
-- ✅ Consistent API responses
 - ✅ Docker setup with Spark support
+
+## Phase 2: Component Registry & JSON Schema Auto-Generator ✅
+
+**Status: Complete**
+
+- ✅ `@config_schema` decorator for automatic schema generation
+- ✅ `Field()` descriptor with validation constraints and UI hints
+- ✅ Component Registry with automatic discovery on startup
+- ✅ 6 example components (Salesforce, JDBC, SCD Type 2, XGBoost, Kafka, Data Quality)
+- ✅ Enhanced API endpoints with search and sample data
+- ✅ JSON Schema validation with field-level errors
+- ✅ UI metadata (widget, group, order, placeholders)
+- ✅ Fuzzy search with relevance ranking
+- ✅ 100% automatic - zero hard-coded schemas
 
 ### API Endpoints
 
-#### Components
-- `GET /api/v1/components` — List all components
-- `GET /api/v1/components/categories` — Get components by category
-- `GET /api/v1/components/{type}/{name}` — Get component detail
-- `POST /api/v1/components/{type}/{name}/validate` — Validate config
+#### Components (Phase 2 - Enhanced)
+- `GET /api/v1/components` — All components with full config schemas
+- `GET /api/v1/components/category/{category}` — Filter by category
+- `GET /api/v1/components/{category}/{name}` — Component detail + schema
+- `POST /api/v1/components/{category}/{name}/validate` — Validate with field errors
+- `GET /api/v1/components/search?q={query}` — Fuzzy search with ranking
+- `GET /api/v1/components/{category}/{name}/sample-data` — Execute for preview
 
 #### Pipelines
 - `GET /api/v1/pipelines` — List all pipelines
@@ -149,7 +161,7 @@ Configure Git strategy, cluster settings, pipeline defaults, and UI preferences.
 ## Development Phases
 
 - [x] **Phase 1**: Backend API Core (Complete)
-- [ ] **Phase 2**: Component Registry & JSON Schema Auto-generator
+- [x] **Phase 2**: Component Registry & JSON Schema Auto-generator (Complete)
 - [ ] **Phase 3**: Frontend Core Canvas with Git Integration
 - [ ] **Phase 4**: Node Library + Auto-forms + Monaco Editor
 - [ ] **Phase 5**: Live Preview Engine (1000-row sample runs)

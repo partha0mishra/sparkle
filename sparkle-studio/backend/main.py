@@ -13,7 +13,7 @@ from core.config import settings
 from core.dependencies import get_spark
 from schemas.response import APIResponse, HealthResponse
 from api.v1.router import api_router
-from services.component_service import component_service
+from component_registry import get_registry
 from services.git_service import git_service
 
 
@@ -25,11 +25,17 @@ async def lifespan(app: FastAPI):
     # Startup
     print("🚀 Starting Sparkle Studio Backend...")
 
-    # Initialize component registry
+    # Initialize component registry (Phase 2)
     print("📦 Initializing component registry...")
     try:
-        component_service.initialize()
-        print(f"✅ Loaded components successfully")
+        registry = get_registry()
+        stats = registry.get_stats()
+        print(f"✅ Sparkle Studio registered:")
+        print(f"   • {stats.get('connection', 0)} connections")
+        print(f"   • {stats.get('ingestor', 0)} ingestors")
+        print(f"   • {stats.get('transformer', 0)} transformers")
+        print(f"   • {stats.get('ml', 0)} ml modules")
+        print(f"   • Total: {stats.get('total', 0)} components")
     except Exception as e:
         print(f"⚠️  Warning: Could not initialize components: {e}")
 

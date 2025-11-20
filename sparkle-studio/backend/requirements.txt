@@ -24,5 +24,8 @@ passlib[bcrypt]==1.7.4
 # Configuration
 pyyaml==6.0.1
 
+# JSON Schema validation (Phase 2)
+jsonschema==4.20.0
+
 # Development
 python-dotenv==1.0.0

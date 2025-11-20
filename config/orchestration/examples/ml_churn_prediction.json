@@ -1,0 +1,112 @@
+{
+  "pipeline_name": "ml_customer_churn_training",
+  "pipeline_type": "ml_training_champion_challenger",
+  "env": "prod",
+
+  "source_system": "feature_store",
+  "source_table": "main.feature_store.customer_features",
+
+  "destination_catalog": "${CATALOG:main}",
+  "destination_schema": "${SCHEMA:ml_models}",
+  "destination_table": "churn_predictions",
+
+  "model_name": "customer_churn_v3",
+
+  "feature_columns": [
+    "total_orders",
+    "avg_order_value",
+    "days_since_last_order",
+    "lifetime_value",
+    "recency",
+    "frequency",
+    "monetary",
+    "engagement_score",
+    "customer_age_days",
+    "support_tickets_count",
+    "avg_session_duration"
+  ],
+
+  "target_column": "churned",
+
+  "primary_key": ["customer_id"],
+
+  "schedule": "0 2 * * 1",
+
+  "tags": {
+    "team": "ml-engineering",
+    "domain": "customer",
+    "model_type": "classification",
+    "use_case": "churn_prediction",
+    "criticality": "high"
+  },
+
+  "extra_config": {
+    "training_config": {
+      "train_test_split": 0.8,
+      "stratify": true,
+      "random_state": 42
+    },
+    "models_to_train": [
+      {
+        "name": "xgboost",
+        "type": "xgboost_spark_trainer",
+        "params": {
+          "max_depth": 6,
+          "learning_rate": 0.1,
+          "n_estimators": 100,
+          "objective": "binary:logistic"
+        }
+      },
+      {
+        "name": "lightgbm",
+        "type": "lightgbm_spark_trainer",
+        "params": {
+          "num_iterations": 100,
+          "learning_rate": 0.1,
+          "num_leaves": 31
+        }
+      },
+      {
+        "name": "random_forest",
+        "type": "random_forest_classifier",
+        "params": {
+          "numTrees": 100,
+          "maxDepth": 10
+        }
+      }
+    ],
+    "champion_criteria": {
+      "metric": "auc",
+      "threshold": 0.85,
+      "improvement_threshold": 0.02
+    },
+    "mlflow_config": {
+      "experiment_name": "/Shared/ml/customer_churn",
+      "track_metrics": ["auc", "precision", "recall", "f1"],
+      "log_model_signature": true
+    },
+    "unity_catalog_registration": {
+      "catalog": "main",
+      "schema": "ml_models",
+      "model_name": "customer_churn",
+      "tags": {
+        "model_version": "v3",
+        "trained_by": "ml_pipeline",
+        "training_frequency": "weekly"
+      }
+    },
+    "feature_importance": {
+      "calculate": true,
+      "method": "shap",
+      "log_to_mlflow": true
+    },
+    "model_validation": {
+      "validation_checks": [
+        "auc >= 0.75",
+        "precision >= 0.7",
+        "recall >= 0.65"
+      ],
+      "fail_on_validation_error": true
+    }
+  }
+}

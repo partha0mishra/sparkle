@@ -1,0 +1,171 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Sparkle Pipeline Configuration Schema",
+  "description": "Configuration schema for Sparkle orchestration pipelines",
+  "type": "object",
+  "required": [
+    "pipeline_name",
+    "pipeline_type",
+    "env"
+  ],
+  "properties": {
+    "pipeline_name": {
+      "type": "string",
+      "description": "Unique name of the pipeline",
+      "pattern": "^[a-z0-9_]+$"
+    },
+    "pipeline_type": {
+      "type": "string",
+      "description": "Type of pipeline template to use",
+      "enum": [
+        "bronze_raw_ingestion",
+        "bronze_streaming_ingestion",
+        "silver_batch_transformation",
+        "silver_streaming_transformation",
+        "gold_daily_aggregate",
+        "gold_realtime_dashboard",
+        "dimension_daily_scd2",
+        "fact_daily_incremental",
+        "feature_store_daily_materialization",
+        "feature_store_realtime_sync",
+        "ml_training_champion_challenger",
+        "ml_batch_scoring",
+        "ml_realtime_scoring",
+        "model_drift_monitoring",
+        "data_quality_expectations",
+        "data_contract_enforcement",
+        "backfill_historical",
+        "catchup_after_outage",
+        "table_reconciliation",
+        "vacuum_optimize_maintenance",
+        "zorder_analyze",
+        "unity_catalog_governance_sync",
+        "cost_attribution_tagging",
+        "disaster_recovery_replication"
+      ]
+    },
+    "env": {
+      "type": "string",
+      "description": "Environment",
+      "enum": ["dev", "qa", "prod"]
+    },
+    "source_system": {
+      "type": "string",
+      "description": "Source system identifier"
+    },
+    "source_connection": {
+      "type": "string",
+      "description": "Connection name for source"
+    },
+    "source_table": {
+      "type": "string",
+      "description": "Source table name"
+    },
+    "source_tables": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "List of source tables"
+    },
+    "destination_catalog": {
+      "type": "string",
+      "description": "Unity Catalog destination catalog"
+    },
+    "destination_schema": {
+      "type": "string",
+      "description": "Unity Catalog destination schema"
+    },
+    "destination_table": {
+      "type": "string",
+      "description": "Destination table name"
+    },
+    "primary_key": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Primary key columns"
+    },
+    "business_key": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Business key columns for SCD"
+    },
+    "partition_columns": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Partition columns"
+    },
+    "watermark_column": {
+      "type": "string",
+      "description": "Column for watermark tracking"
+    },
+    "transformers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": {"type": "string"},
+          "params": {"type": "object"}
+        }
+      },
+      "description": "List of transformers to apply"
+    },
+    "ingestor": {
+      "type": "string",
+      "description": "Ingestor component to use"
+    },
+    "write_mode": {
+      "type": "string",
+      "enum": ["append", "overwrite", "merge"],
+      "default": "append",
+      "description": "Write mode for Delta tables"
+    },
+    "checkpoint_location": {
+      "type": "string",
+      "description": "Checkpoint location for streaming"
+    },
+    "model_name": {
+      "type": "string",
+      "description": "ML model name"
+    },
+    "feature_columns": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Feature columns for ML"
+    },
+    "target_column": {
+      "type": "string",
+      "description": "Target column for ML"
+    },
+    "expectations_suite": {
+      "type": "string",
+      "description": "Great Expectations suite name"
+    },
+    "data_contract": {
+      "type": "object",
+      "description": "Data contract specifications"
+    },
+    "schedule": {
+      "type": "string",
+      "description": "Cron expression or schedule name"
+    },
+    "dependencies": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Upstream pipeline dependencies"
+    },
+    "tags": {
+      "type": "object",
+      "additionalProperties": {"type": "string"},
+      "description": "Tags for cost attribution and metadata"
+    },
+    "alert_channels": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Alert notification channels"
+    },
+    "extra_config": {
+      "type": "object",
+      "description": "Additional pipeline-specific configuration"
+    }
+  }
+}

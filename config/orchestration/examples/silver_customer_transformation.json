@@ -1,0 +1,87 @@
+{
+  "pipeline_name": "silver_customer_transformation",
+  "pipeline_type": "silver_batch_transformation",
+  "env": "prod",
+
+  "source_system": "bronze",
+  "source_table": "main.bronze.customers_raw",
+
+  "destination_catalog": "${CATALOG:main}",
+  "destination_schema": "${SCHEMA:silver}",
+  "destination_table": "customers",
+
+  "transformers": [
+    {
+      "name": "drop_exact_duplicates"
+    },
+    {
+      "name": "standardize_nulls",
+      "params": {
+        "null_values": ["", "NULL", "null", "N/A", "NA", "None", "-"]
+      }
+    },
+    {
+      "name": "trim_and_clean_strings",
+      "params": {
+        "columns": ["first_name", "last_name", "email", "phone", "address"]
+      }
+    },
+    {
+      "name": "clean_email_addresses",
+      "params": {
+        "email_column": "email"
+      }
+    },
+    {
+      "name": "clean_phone_numbers",
+      "params": {
+        "phone_column": "phone",
+        "country_code": "US"
+      }
+    },
+    {
+      "name": "add_audit_columns",
+      "params": {
+        "user": "silver_etl_pipeline"
+      }
+    },
+    {
+      "name": "add_hash_key",
+      "params": {
+        "source_columns": ["customer_id", "email"],
+        "hash_column": "customer_hash"
+      }
+    }
+  ],
+
+  "primary_key": ["customer_id"],
+  "partition_columns": ["registration_date"],
+  "watermark_column": "updated_at",
+
+  "write_mode": "overwrite",
+
+  "schedule": "0 3 * * *",
+  "dependencies": ["bronze_customer_ingestion"],
+
+  "tags": {
+    "team": "data-engineering",
+    "domain": "customer",
+    "layer": "silver",
+    "pii": "true",
+    "criticality": "high"
+  },
+
+  "alert_channels": [
+    "slack://data-eng-alerts"
+  ],
+
+  "extra_config": {
+    "schema_enforcement": true,
+    "schema_evolution": "strict",
+    "quality_checks": {
+      "null_check_columns": ["customer_id", "email"],
+      "uniqueness_check": ["customer_id"],
+      "email_format_check": true
+    }
+  }
+}

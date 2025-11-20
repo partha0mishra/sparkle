@@ -1,0 +1,14 @@
+{
+  "sfUrl": "mycompany.snowflakecomputing.com",
+  "sfUser": "${SNOWFLAKE_USER}",
+  "sfPassword": "${SNOWFLAKE_PASSWORD}",
+  "sfDatabase": "ANALYTICS_PROD",
+  "sfSchema": "PUBLIC",
+  "sfWarehouse": "COMPUTE_WH",
+  "sfRole": "ANALYST_ROLE",
+  "properties": {
+    "sfCompress": "on",
+    "sfTimezone": "UTC",
+    "sfQueryTag": "sparkle_etl"
+  }
+}

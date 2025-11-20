@@ -1,0 +1,7 @@
+{
+  "catalog": "main",
+  "schema": "default",
+  "metastore_id": "prod-metastore-abc123",
+  "workspace_url": "https://dbc-abc123-def456.cloud.databricks.com",
+  "access_token": "${DATABRICKS_TOKEN}"
+}

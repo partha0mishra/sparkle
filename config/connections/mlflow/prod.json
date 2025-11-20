@@ -1,0 +1,8 @@
+{
+  "tracking_uri": "https://mlflow.prod.example.com",
+  "registry_uri": "https://mlflow.prod.example.com",
+  "experiment_name": "production_models",
+  "auth_type": "basic",
+  "username": "${MLFLOW_USER}",
+  "password": "${MLFLOW_PASSWORD}"
+}

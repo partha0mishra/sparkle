@@ -1,0 +1,5 @@
+{
+  "url": "jdbc:postgresql://dev-postgres.example.com:5432/analytics_dev",
+  "user": "${POSTGRES_USER}",
+  "password": "${POSTGRES_PASSWORD}"
+}

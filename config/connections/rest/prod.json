@@ -1,0 +1,13 @@
+{
+  "base_url": "https://api.example.com/v1",
+  "auth_type": "bearer",
+  "token": "${API_TOKEN}",
+  "headers": {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+    "User-Agent": "Sparkle/1.0.0"
+  },
+  "rate_limit": 100,
+  "retry_attempts": 3,
+  "timeout": 60
+}

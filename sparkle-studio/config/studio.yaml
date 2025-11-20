@@ -1,0 +1,108 @@
+# Sparkle Studio Configuration
+# This file defines Studio-specific settings for Git, cluster, pipelines, and UI.
+
+# Git Configuration
+git:
+  # Git repository URL (optional - can use local repo only)
+  repository: null
+
+  # Branch strategy
+  branch_strategy:
+    main: main
+    development: develop
+    feature_prefix: "feature/"
+
+  # Auto-commit changes when saving pipelines
+  auto_commit: true
+
+# Cluster Configuration
+cluster:
+  # Default cluster to use
+  default: local
+
+  # Local Spark configuration
+  local:
+    type: local
+    spark_master: "local[*]"
+
+  # Example: Databricks configuration (uncomment to use)
+  # databricks:
+  #   type: databricks
+  #   url: "https://your-workspace.cloud.databricks.com"
+  #   token: "${DATABRICKS_TOKEN}"
+  #   cluster_id: "your-cluster-id"
+
+  # Example: EMR configuration (uncomment to use)
+  # emr:
+  #   type: emr
+  #   cluster_id: "j-XXXXXXXXXXXXX"
+  #   region: "us-east-1"
+  #   s3_bucket: "your-emr-bucket"
+
+# Pipeline Configuration
+pipelines:
+  # Directory in Git repo where pipelines are stored
+  directory: "pipelines"
+
+  # Directory for pipeline-specific config files
+  config_directory: "config"
+
+  # Auto-save interval in seconds (for frontend)
+  auto_save_interval: 30
+
+# Execution Configuration
+execution:
+  # Sample size for dry-run mode (Live Preview)
+  dry_run_sample_size: 1000
+
+  # Default Spark parallelism
+  default_parallelism: 4
+
+  # Default retry policy
+  retry_policy:
+    max_retries: 3
+    retry_delay_seconds: 60
+
+  # Notifications (Phase 7)
+  notifications:
+    enabled: false
+    channels: []
+
+# UI Configuration
+ui:
+  # Theme (dark/light)
+  theme: dark
+
+  # Auto-save interval (seconds)
+  auto_save_interval: 30
+
+  # Canvas settings
+  canvas:
+    grid_size: 20
+    snap_to_grid: true
+    zoom_on_scroll: true
+
+  # Code editor settings
+  editor:
+    theme: "vs-dark"
+    font_size: 14
+    tab_size: 4
+    minimap_enabled: true
+
+# Observability (Phase 7)
+observability:
+  enabled: false
+  metrics_retention_days: 30
+  logs_retention_days: 7
+
+# RBAC (Phase 8)
+rbac:
+  enabled: false
+  default_role: "developer"
+  roles:
+    - name: "viewer"
+      permissions: ["read"]
+    - name: "developer"
+      permissions: ["read", "write"]
+    - name: "admin"
+      permissions: ["read", "write", "admin"]

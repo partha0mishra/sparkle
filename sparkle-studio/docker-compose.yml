@@ -1,0 +1,93 @@
+version: '3.8'
+
+services:
+  # Sparkle Studio Backend
+  studio-backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: sparkle-studio-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - SPARKLE_ENV=local
+      - DEBUG=true
+      - BACKEND_CORS_ORIGINS=http://localhost:3000,http://localhost:8000,http://localhost
+      - GIT_REPO_PATH=/app/git_repo
+      - GIT_DEFAULT_BRANCH=main
+      - SPARK_MASTER=local[*]
+      - SPARK_APP_NAME=SparkleStudio
+      - STUDIO_CONFIG_PATH=/app/config/studio.yaml
+      - SPARKLE_ENGINE_PATH=/opt/sparkle
+      - SECRET_KEY=dev-secret-key-change-in-production
+    volumes:
+      # Mount Sparkle engine from host
+      - ../sparkle:/opt/sparkle:ro
+      # Mount Git repository (persistent)
+      - ./data/git_repo:/app/git_repo
+      # Mount config
+      - ./config:/app/config:ro
+      # Mount backend code for development (hot reload)
+      - ./backend:/app
+    networks:
+      - sparkle-network
+    depends_on:
+      - spark-master
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Apache Spark Master (from existing setup)
+  spark-master:
+    image: apache/spark:3.5.0-python3
+    container_name: spark-master
+    command: /opt/spark/bin/spark-class org.apache.spark.deploy.master.Master
+    ports:
+      - "8080:8080"  # Spark Master Web UI
+      - "7077:7077"  # Spark Master
+    environment:
+      - SPARK_MODE=master
+      - SPARK_MASTER_HOST=spark-master
+      - SPARK_MASTER_PORT=7077
+    volumes:
+      - spark-master-data:/opt/spark/data
+      - ../data:/data
+    networks:
+      - sparkle-network
+    restart: unless-stopped
+
+  # Apache Spark Worker (from existing setup)
+  spark-worker:
+    image: apache/spark:3.5.0-python3
+    container_name: spark-worker
+    command: /opt/spark/bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark-master:7077
+    ports:
+      - "8081:8081"  # Spark Worker Web UI
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark-master:7077
+      - SPARK_WORKER_CORES=2
+      - SPARK_WORKER_MEMORY=2g
+    volumes:
+      - spark-worker-data:/opt/spark/data
+      - ../data:/data
+    networks:
+      - sparkle-network
+    depends_on:
+      - spark-master
+    restart: unless-stopped
+
+networks:
+  sparkle-network:
+    name: sparkle-network
+    driver: bridge
+
+volumes:
+  spark-master-data:
+    name: spark-master-data
+  spark-worker-data:
+    name: spark-worker-data

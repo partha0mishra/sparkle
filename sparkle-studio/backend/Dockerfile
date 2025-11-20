@@ -15,10 +15,10 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Java for Spark
-RUN apt-get update && apt-get install -y openjdk-11-jre-headless \
+RUN apt-get update && apt-get install -y default-jre-headless \
     && rm -rf /var/lib/apt/lists/*
 
-ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+ENV JAVA_HOME=/usr/lib/jvm/default-java
 
 # Stage: Dependencies
 FROM base as dependencies

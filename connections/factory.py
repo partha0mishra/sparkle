@@ -173,3 +173,73 @@ def register_connection(name: str):
         ConnectionFactory.register(name, cls)
         return cls
     return decorator
+
+
+# Alias for cleaner API: Connection.get()
+class Connection:
+    """
+    Unified connection interface for Sparkle.
+
+    Provides clean API for creating connections:
+        >>> from sparkle.connections import Connection
+        >>> conn = Connection.get("postgres", spark, env="prod")
+        >>> df = conn.read(table="customers")
+    """
+
+    @staticmethod
+    def get(
+        name: str,
+        spark: SparkSession,
+        env: str = "prod",
+        config: Optional[Dict[str, Any]] = None,
+        **kwargs
+    ) -> SparkleConnection:
+        """
+        Get a connection instance by name.
+
+        Args:
+            name: Connection type (e.g., 'postgres', 's3', 'kafka')
+            spark: SparkSession instance
+            env: Environment (dev/qa/prod)
+            config: Optional config override
+            **kwargs: Additional connection-specific parameters
+
+        Returns:
+            Initialized connection instance
+
+        Example:
+            >>> from sparkle.connections import Connection
+            >>> conn = Connection.get("snowflake", spark, env="prod")
+            >>> df = conn.read(table="CUSTOMERS")
+        """
+        return ConnectionFactory.create(name, spark, env=env, config=config, **kwargs)
+
+    @staticmethod
+    def list() -> list:
+        """
+        List all available connection types.
+
+        Returns:
+            Sorted list of connection names
+
+        Example:
+            >>> from sparkle.connections import Connection
+            >>> print(Connection.list())
+            ['bigquery', 'cassandra', 'delta', 'kafka', ...]
+        """
+        return ConnectionFactory.list_available()
+
+    @staticmethod
+    def register(name: str, connection_class: Type[SparkleConnection]) -> None:
+        """
+        Register a new connection type.
+
+        Args:
+            name: Connection name
+            connection_class: Connection class to register
+
+        Example:
+            >>> from sparkle.connections import Connection
+            >>> Connection.register("mydb", MyDatabaseConnection)
+        """
+        ConnectionFactory.register(name, connection_class)

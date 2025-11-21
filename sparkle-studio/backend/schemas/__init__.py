@@ -1,13 +1,12 @@
 """Pydantic schemas for Sparkle Studio API."""
 from .component import (
     ComponentMetadata,
-    ComponentSchema,
+    ComponentManifestSchema as ComponentSchema,
     ComponentDetail,
     ComponentValidationRequest,
     ComponentValidationResponse,
-    ComponentCategory,
+    ComponentCategoryEnum as ComponentCategory,
     ComponentListResponse,
-    ComponentCategoriesResponse,
 )
 from .pipeline import (
     Position,
@@ -52,7 +51,6 @@ __all__ = [
     "ComponentValidationResponse",
     "ComponentCategory",
     "ComponentListResponse",
-    "ComponentCategoriesResponse",
     # Pipeline
     "Position",
     "NodeData",

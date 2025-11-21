@@ -1,0 +1,31 @@
+# FastAPI and server
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+python-multipart==0.0.6
+
+# Pydantic and settings
+pydantic==2.5.3
+pydantic-settings==2.1.0
+
+# Git operations
+gitpython==3.1.40
+
+# HTTP requests (for Git PR creation)
+requests==2.31.0
+
+# Spark
+pyspark==3.5.0
+delta-spark==3.0.0
+
+# Security
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+
+# Configuration
+pyyaml==6.0.1
+
+# JSON Schema validation (Phase 2)
+jsonschema==4.20.0
+
+# Development
+python-dotenv==1.0.0

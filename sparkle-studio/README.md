@@ -61,6 +61,23 @@ sparkle-studio/
 - ✅ Fuzzy search with relevance ranking
 - ✅ 100% automatic - zero hard-coded schemas
 
+## Phase 3: Frontend Core Canvas with Git Integration ✅
+
+**Status: Complete**
+
+- ✅ React 18 + TypeScript with strict mode
+- ✅ React Flow visual canvas with drag & drop
+- ✅ Custom nodes with icons and category badges
+- ✅ Auto-generated forms from JSON Schema
+- ✅ Git integration (branches, commit, pull, PR)
+- ✅ Zustand state management with undo/redo
+- ✅ Tailwind CSS beautiful UI
+- ✅ Monaco code editor for SQL/Python
+- ✅ Docker multi-stage build with nginx
+- ✅ Full TypeScript type safety (no `any`)
+- ✅ Keyboard shortcuts (Ctrl+S, Ctrl+Z)
+- ✅ Component search and filtering
+
 ### API Endpoints
 
 #### Components (Phase 2 - Enhanced)
@@ -116,11 +133,13 @@ sparkle-studio/
    docker-compose up -d
    ```
 
-4. **Access the API:**
-   - API: http://localhost:8000
-   - API Docs: http://localhost:8000/docs
-   - Health Check: http://localhost:8000/health
-   - Spark Master UI: http://localhost:8080
+4. **Access the services:**
+   - **Frontend UI**: http://localhost:3000
+   - **Backend API**: http://localhost:8000
+   - **API Docs**: http://localhost:8000/docs
+   - **Health Check**: http://localhost:8000/health
+   - **Spark Master UI**: http://localhost:8080
+   - **Spark Worker UI**: http://localhost:8081
 
 ### Local Development
 
@@ -162,8 +181,8 @@ Configure Git strategy, cluster settings, pipeline defaults, and UI preferences.
 
 - [x] **Phase 1**: Backend API Core (Complete)
 - [x] **Phase 2**: Component Registry & JSON Schema Auto-generator (Complete)
-- [ ] **Phase 3**: Frontend Core Canvas with Git Integration
-- [ ] **Phase 4**: Node Library + Auto-forms + Monaco Editor
+- [x] **Phase 3**: Frontend Core Canvas with Git Integration (Complete)
+- [ ] **Phase 4**: Pipeline Execution & Real-time Logs
 - [ ] **Phase 5**: Live Preview Engine (1000-row sample runs)
 - [ ] **Phase 6**: Execution Bridge (Run/Backfill/Schedule)
 - [ ] **Phase 7**: Observability Dashboard per Pipeline
@@ -211,11 +230,12 @@ Apache License 2.0
 
 ## Next Steps
 
-**Phase 2** will focus on:
-- Enhanced component registry with metadata extraction
-- Automatic JSON Schema generation from all Sparkle components
-- Component versioning and discovery improvements
-- Integration testing with real Sparkle components
+**Phase 4** will focus on:
+- Real-time pipeline execution with WebSocket logs
+- Live execution monitoring and debugging
+- Pipeline run history and status tracking
+- Error handling and retry mechanisms
+- Performance metrics and profiling
 
 ---
 

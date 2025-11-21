@@ -41,6 +41,28 @@ services:
       retries: 3
       start_period: 40s
 
+  # Sparkle Studio Frontend
+  studio-frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: sparkle-studio-frontend
+    ports:
+      - "3000:80"
+    environment:
+      - VITE_API_URL=http://studio-backend:8000
+    networks:
+      - sparkle-network
+    depends_on:
+      - studio-backend
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
   # Apache Spark Master (from existing setup)
   spark-master:
     image: apache/spark:3.5.0-python3

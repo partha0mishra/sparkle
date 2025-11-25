@@ -16,6 +16,7 @@ from .factory import register_connection
 class SnowflakeConnection(SparkleConnection):
     """
     Snowflake connection via Spark connector.
+    Sub-Group: Data Warehouses
 
     Example config (config/connections/snowflake/prod.json):
         {
@@ -164,6 +165,7 @@ class SnowflakeConnection(SparkleConnection):
 class RedshiftConnection(SparkleConnection):
     """
     AWS Redshift connection.
+    Sub-Group: Data Warehouses
 
     Example config:
         {
@@ -240,6 +242,7 @@ class RedshiftConnection(SparkleConnection):
 class BigQueryConnection(SparkleConnection):
     """
     Google BigQuery connection.
+    Sub-Group: Data Warehouses
 
     Example config:
         {
@@ -362,6 +365,7 @@ class BigQueryConnection(SparkleConnection):
 class SynapseConnection(SparkleConnection):
     """
     Azure Synapse Analytics connection.
+    Sub-Group: Data Warehouses
 
     Example config:
         {
@@ -432,6 +436,7 @@ class SynapseConnection(SparkleConnection):
 class DatabricksSQLConnection(SparkleConnection):
     """
     Databricks SQL Warehouse connection.
+    Sub-Group: Data Warehouses
 
     Example config:
         {
@@ -504,6 +509,7 @@ class DatabricksSQLConnection(SparkleConnection):
 class AthenaConnection(SparkleConnection):
     """
     Amazon Athena connection.
+    Sub-Group: Data Warehouses
 
     Example config:
         {
@@ -601,6 +607,7 @@ class AthenaConnection(SparkleConnection):
 class DremioConnection(SparkleConnection):
     """
     Dremio data lakehouse connection.
+    Sub-Group: Data Warehouses
 
     Supports both Arrow Flight and JDBC connectors.
 
@@ -728,6 +735,7 @@ class DremioConnection(SparkleConnection):
 class DruidConnection(SparkleConnection):
     """
     Apache Druid real-time analytics connection.
+    Sub-Group: Data Warehouses
 
     Example config:
         {
@@ -817,6 +825,7 @@ class DruidConnection(SparkleConnection):
 class PinotConnection(SparkleConnection):
     """
     Apache Pinot real-time OLAP connection.
+    Sub-Group: Data Warehouses
 
     Example config:
         {

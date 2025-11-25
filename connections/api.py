@@ -19,6 +19,7 @@ from .factory import register_connection
 class RESTAPIConnection(APIConnection):
     """
     Generic REST API connection.
+    Sub-Group: APIs
 
     Example config (config/connections/rest/prod.json):
         {
@@ -203,6 +204,7 @@ class RESTAPIConnection(APIConnection):
 class GraphQLConnection(APIConnection):
     """
     GraphQL API connection.
+    Sub-Group: APIs
 
     Example config:
         {
@@ -326,6 +328,7 @@ class GraphQLConnection(APIConnection):
 class SOAPConnection(APIConnection):
     """
     SOAP web service connection.
+    Sub-Group: APIs
 
     Example config:
         {
@@ -367,6 +370,7 @@ class SOAPConnection(APIConnection):
 class gRPCConnection(APIConnection):
     """
     gRPC service connection.
+    Sub-Group: APIs
 
     Example config:
         {
@@ -399,6 +403,7 @@ class gRPCConnection(APIConnection):
 class WebhookConnection(APIConnection):
     """
     Webhook connection for sending data to webhooks.
+    Sub-Group: APIs
 
     Example config:
         {
@@ -466,6 +471,7 @@ class WebhookConnection(APIConnection):
 class HTTPConnection(APIConnection):
     """
     Generic HTTP connection for custom integrations.
+    Sub-Group: APIs
 
     Example config:
         {

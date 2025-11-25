@@ -21,6 +21,7 @@ from .factory import register_connection
 class SalesforceCDCConnection(APIConnection):
     """
     Salesforce Change Data Capture (CDC) streaming connection.
+    Sub-Group: SaaS Platforms
 
     Example config:
         {
@@ -89,6 +90,7 @@ class SalesforceCDCConnection(APIConnection):
 class NetsuiteConnection(APIConnection):
     """
     Oracle Netsuite connection via SuiteAnalytics Connect / REST API.
+    Sub-Group: SaaS Platforms
 
     Example config:
         {
@@ -215,6 +217,7 @@ class NetsuiteConnection(APIConnection):
 class WorkdayPrismConnection(APIConnection):
     """
     Workday Prism Analytics connection.
+    Sub-Group: SaaS Platforms
 
     Example config:
         {
@@ -292,6 +295,7 @@ class WorkdayPrismConnection(APIConnection):
 class ServiceNowConnection(APIConnection):
     """
     ServiceNow connection via REST API.
+    Sub-Group: SaaS Platforms
 
     Example config:
         {
@@ -408,6 +412,7 @@ class ServiceNowConnection(APIConnection):
 class MarketoConnection(APIConnection):
     """
     Marketo connection via Bulk Extract API.
+    Sub-Group: SaaS Platforms
 
     Example config:
         {
@@ -537,6 +542,7 @@ class MarketoConnection(APIConnection):
 class HubSpotConnection(APIConnection):
     """
     HubSpot CRM connection via REST API v3.
+    Sub-Group: SaaS Platforms
 
     Example config:
         {
@@ -666,6 +672,7 @@ class HubSpotConnection(APIConnection):
 class ZendeskConnection(APIConnection):
     """
     Zendesk connection via REST API.
+    Sub-Group: SaaS Platforms
 
     Example config:
         {
@@ -776,6 +783,7 @@ class ZendeskConnection(APIConnection):
 class ShopifyConnection(APIConnection):
     """
     Shopify connection via GraphQL Admin API.
+    Sub-Group: SaaS Platforms
 
     Example config:
         {
@@ -893,6 +901,7 @@ class ShopifyConnection(APIConnection):
 class StripeConnection(APIConnection):
     """
     Stripe connection via REST API.
+    Sub-Group: SaaS Platforms
 
     Example config:
         {
@@ -997,6 +1006,7 @@ class StripeConnection(APIConnection):
 class ZuoraConnection(APIConnection):
     """
     Zuora subscription billing connection via AQuA API.
+    Sub-Group: SaaS Platforms
 
     Example config:
         {
@@ -1128,6 +1138,7 @@ class ZuoraConnection(APIConnection):
 class GoogleAnalytics4Connection(APIConnection):
     """
     Google Analytics 4 connection.
+    Sub-Group: SaaS Platforms
 
     Note: Prefer BigQuery export for large-scale analytics.
 
@@ -1238,6 +1249,7 @@ class GoogleAnalytics4Connection(APIConnection):
 class GoogleAdsConnection(APIConnection):
     """
     Google Ads connection via Google Ads API.
+    Sub-Group: SaaS Platforms
 
     Example config:
         {
@@ -1344,6 +1356,7 @@ class GoogleAdsConnection(APIConnection):
 class FacebookAdsConnection(APIConnection):
     """
     Facebook / Meta Ads Marketing API connection.
+    Sub-Group: SaaS Platforms
     
     Reads campaign, adset, and ad performance data from Meta Marketing API.
     
@@ -1467,6 +1480,7 @@ class FacebookAdsConnection(APIConnection):
 class LinkedInAdsConnection(APIConnection):
     """
     LinkedIn Ads Marketing API connection.
+    Sub-Group: SaaS Platforms
     
     Reads campaign and ad analytics from LinkedIn Marketing API.
     
@@ -1595,6 +1609,7 @@ class LinkedInAdsConnection(APIConnection):
 class AmplitudeConnection(APIConnection):
     """
     Amplitude Analytics Export API connection.
+    Sub-Group: SaaS Platforms
     
     Reads event data from Amplitude Export API.
     
@@ -1725,6 +1740,7 @@ class AmplitudeConnection(APIConnection):
 class SegmentConnection(APIConnection):
     """
     Segment CDP connection via S3 export or Destinations.
+    Sub-Group: SaaS Platforms
     
     Reads event data from Segment S3 exports or via Personas/Profiles API.
     

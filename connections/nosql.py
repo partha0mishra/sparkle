@@ -17,6 +17,7 @@ from .factory import register_connection
 class MongoDBConnection(SparkleConnection):
     """
     MongoDB connection via Spark connector.
+    Sub-Group: NoSQL & Document Stores
 
     Example config (config/connections/mongodb/prod.json):
         {
@@ -149,6 +150,7 @@ class MongoDBConnection(SparkleConnection):
 class CassandraConnection(SparkleConnection):
     """
     Apache Cassandra connection.
+    Sub-Group: NoSQL & Document Stores
 
     Example config:
         {
@@ -244,6 +246,7 @@ class CassandraConnection(SparkleConnection):
 class DynamoDBConnection(SparkleConnection):
     """
     AWS DynamoDB connection.
+    Sub-Group: NoSQL & Document Stores
 
     Example config:
         {
@@ -310,6 +313,7 @@ class DynamoDBConnection(SparkleConnection):
 class CosmosDBConnection(SparkleConnection):
     """
     Azure Cosmos DB connection.
+    Sub-Group: NoSQL & Document Stores
 
     Example config:
         {
@@ -374,6 +378,7 @@ class CosmosDBConnection(SparkleConnection):
 class ElasticsearchConnection(SparkleConnection):
     """
     Elasticsearch connection.
+    Sub-Group: NoSQL & Document Stores
 
     Example config:
         {
@@ -455,6 +460,7 @@ class ElasticsearchConnection(SparkleConnection):
 class HBaseConnection(SparkleConnection):
     """
     Apache HBase connection.
+    Sub-Group: NoSQL & Document Stores
 
     Example config:
         {
@@ -487,6 +493,7 @@ class HBaseConnection(SparkleConnection):
 class CouchbaseConnection(SparkleConnection):
     """
     Couchbase connection.
+    Sub-Group: NoSQL & Document Stores
 
     Example config:
         {
@@ -520,6 +527,7 @@ class CouchbaseConnection(SparkleConnection):
 class Neo4jConnection(SparkleConnection):
     """
     Neo4j graph database connection.
+    Sub-Group: NoSQL & Document Stores
 
     Example config:
         {
@@ -566,6 +574,7 @@ class Neo4jConnection(SparkleConnection):
 class RedisConnection(SparkleConnection):
     """
     Redis connection.
+    Sub-Group: NoSQL & Document Stores
 
     Example config:
         {
@@ -603,6 +612,7 @@ class RedisConnection(SparkleConnection):
 class ScyllaDBConnection(CassandraConnection):
     """
     ScyllaDB connection (uses Cassandra connector).
+    Sub-Group: NoSQL & Document Stores
 
     Example config:
         {

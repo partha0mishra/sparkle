@@ -19,6 +19,7 @@ from .factory import register_connection
 class PostgreSQLConnection(JDBCConnection):
     """
     PostgreSQL connection via JDBC.
+    Sub-Group: Relational Databases
 
     Example config (config/connections/postgresql/prod.json):
         {
@@ -57,6 +58,7 @@ class PostgreSQLConnection(JDBCConnection):
 class MySQLConnection(JDBCConnection):
     """
     MySQL connection via JDBC.
+    Sub-Group: Relational Databases
 
     Example config:
         {
@@ -83,6 +85,7 @@ class MySQLConnection(JDBCConnection):
 class MariaDBConnection(JDBCConnection):
     """
     MariaDB connection via JDBC.
+    Sub-Group: Relational Databases
 
     Example config:
         {
@@ -106,6 +109,7 @@ class MariaDBConnection(JDBCConnection):
 class OracleConnection(JDBCConnection):
     """
     Oracle Database connection via JDBC.
+    Sub-Group: Relational Databases
 
     Example config:
         {
@@ -132,6 +136,7 @@ class OracleConnection(JDBCConnection):
 class SQLServerConnection(JDBCConnection):
     """
     Microsoft SQL Server connection via JDBC.
+    Sub-Group: Relational Databases
 
     Example config:
         {
@@ -157,6 +162,7 @@ class SQLServerConnection(JDBCConnection):
 class DB2Connection(JDBCConnection):
     """
     IBM DB2 connection via JDBC.
+    Sub-Group: Relational Databases
 
     Example config:
         {
@@ -181,6 +187,7 @@ class DB2Connection(JDBCConnection):
 class TeradataConnection(JDBCConnection):
     """
     Teradata connection via JDBC.
+    Sub-Group: Relational Databases
 
     Example config:
         {
@@ -207,6 +214,7 @@ class TeradataConnection(JDBCConnection):
 class SAPHANAConnection(JDBCConnection):
     """
     SAP HANA connection via JDBC.
+    Sub-Group: Relational Databases
 
     Example config:
         {
@@ -231,6 +239,7 @@ class SAPHANAConnection(JDBCConnection):
 class VerticaConnection(JDBCConnection):
     """
     Vertica connection via JDBC.
+    Sub-Group: Relational Databases
 
     Example config:
         {
@@ -255,6 +264,7 @@ class VerticaConnection(JDBCConnection):
 class GreenplumConnection(JDBCConnection):
     """
     Greenplum connection via JDBC (uses PostgreSQL driver).
+    Sub-Group: Relational Databases
 
     Example config:
         {
@@ -278,6 +288,7 @@ class GreenplumConnection(JDBCConnection):
 class NetezzaConnection(JDBCConnection):
     """
     IBM Netezza connection via JDBC.
+    Sub-Group: Relational Databases
 
     Example config:
         {
@@ -298,6 +309,7 @@ class NetezzaConnection(JDBCConnection):
 class SybaseConnection(JDBCConnection):
     """
     Sybase ASE connection via JDBC.
+    Sub-Group: Relational Databases
 
     Example config:
         {
@@ -318,6 +330,7 @@ class SybaseConnection(JDBCConnection):
 class SQLiteConnection(JDBCConnection):
     """
     SQLite connection via JDBC (for local testing).
+    Sub-Group: Relational Databases
 
     Example config:
         {
@@ -350,6 +363,7 @@ class SQLiteConnection(JDBCConnection):
 class PrestoConnection(JDBCConnection):
     """
     Presto connection via JDBC.
+    Sub-Group: Relational Databases
 
     Example config:
         {
@@ -372,6 +386,7 @@ class PrestoConnection(JDBCConnection):
 class TrinoConnection(JDBCConnection):
     """
     Trino (formerly Presto SQL) connection via JDBC.
+    Sub-Group: Relational Databases
 
     Example config:
         {
@@ -394,6 +409,7 @@ class TrinoConnection(JDBCConnection):
 class ClickHouseConnection(JDBCConnection):
     """
     ClickHouse connection via JDBC.
+    Sub-Group: Relational Databases
 
     Example config:
         {

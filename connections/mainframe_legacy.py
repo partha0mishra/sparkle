@@ -19,6 +19,7 @@ from .factory import register_connection
 class IBMiConnection(JDBCConnection):
     """
     IBM i (AS/400, iSeries) connection via JT400 JDBC driver.
+    Sub-Group: Mainframe & Legacy
 
     Connects to IBM i DB2 databases using the open-source JT400 driver.
 
@@ -103,6 +104,7 @@ class IBMiConnection(JDBCConnection):
 class MainframeEBCDICConnection(SparkleConnection):
     """
     Mainframe EBCDIC/VSAM file connection with COBOL copybook parsing.
+    Sub-Group: Mainframe & Legacy
 
     Reads mainframe files (EBCDIC-encoded) using copybook layout definitions.
     Common use case: Migrating mainframe data to cloud data lakes.
@@ -242,6 +244,7 @@ class MainframeEBCDICConnection(SparkleConnection):
 class SAPODPConnection(SparkleConnection):
     """
     SAP ECC/S/4HANA ODP (Operational Data Provisioning) connection.
+    Sub-Group: Mainframe & Legacy
 
     Extracts data from SAP using ODP framework (replacement for legacy extractors).
     Supports both full and delta loads with change data capture.
@@ -385,6 +388,7 @@ class SAPODPConnection(SparkleConnection):
 class SAPDatasphereConnection(JDBCConnection):
     """
     SAP Datasphere (formerly SAP Data Warehouse Cloud) connection.
+    Sub-Group: Mainframe & Legacy
 
     Connects to SAP's cloud data warehouse via JDBC/ODBC.
 
@@ -434,6 +438,7 @@ class SAPDatasphereConnection(JDBCConnection):
 class OracleEBSConnection(JDBCConnection):
     """
     Oracle E-Business Suite connection.
+    Sub-Group: Mainframe & Legacy
 
     Connects to Oracle EBS database with special handling for
     multi-org, virtual private database (VPD), and EBS-specific tables.
@@ -518,6 +523,7 @@ class OracleEBSConnection(JDBCConnection):
 class PeopleSoftConnection(JDBCConnection):
     """
     Oracle PeopleSoft connection.
+    Sub-Group: Mainframe & Legacy
 
     Connects to PeopleSoft databases (can be Oracle or SQL Server backend).
 

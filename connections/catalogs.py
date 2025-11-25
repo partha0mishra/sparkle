@@ -17,6 +17,7 @@ from .factory import register_connection
 class UnityCatalogConnection(SparkleConnection):
     """
     Databricks Unity Catalog connection.
+    Sub-Group: Lakehouse Table Formats
 
     Example config (config/connections/unity_catalog/prod.json):
         {
@@ -122,6 +123,7 @@ class UnityCatalogConnection(SparkleConnection):
 class HiveMetastoreConnection(SparkleConnection):
     """
     Hive Metastore connection.
+    Sub-Group: Lakehouse Table Formats
 
     Example config:
         {
@@ -182,6 +184,7 @@ class HiveMetastoreConnection(SparkleConnection):
 class GlueCatalogConnection(SparkleConnection):
     """
     AWS Glue Data Catalog connection.
+    Sub-Group: Lakehouse Table Formats
 
     Example config:
         {
@@ -245,6 +248,7 @@ class GlueCatalogConnection(SparkleConnection):
 class PurviewConnection(SparkleConnection):
     """
     Azure Purview data catalog connection.
+    Sub-Group: Lakehouse Table Formats
 
     Example config:
         {
@@ -280,6 +284,7 @@ class PurviewConnection(SparkleConnection):
 class DataHubConnection(SparkleConnection):
     """
     DataHub metadata platform connection.
+    Sub-Group: Lakehouse Table Formats
 
     Example config:
         {
@@ -314,6 +319,7 @@ class DataHubConnection(SparkleConnection):
 class AtlasConnection(SparkleConnection):
     """
     Apache Atlas metadata catalog connection.
+    Sub-Group: Lakehouse Table Formats
 
     Example config:
         {
@@ -355,6 +361,7 @@ class AtlasConnection(SparkleConnection):
 class AmundsenConnection(SparkleConnection):
     """
     Amundsen metadata platform connection.
+    Sub-Group: Lakehouse Table Formats
 
     Example config:
         {

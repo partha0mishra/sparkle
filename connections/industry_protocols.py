@@ -20,6 +20,7 @@ from .factory import register_connection
 class FHIRConnection(APIConnection):
     """
     HL7 FHIR (Fast Healthcare Interoperability Resources) connection.
+    Sub-Group: Industry Protocols
 
     Reads healthcare data from FHIR R4/R5 compliant servers.
     Supports Patient, Observation, Encounter, MedicationRequest, etc.
@@ -211,6 +212,7 @@ class FHIRConnection(APIConnection):
 class X12EDIConnection(SparkleConnection):
     """
     X12 EDI (Electronic Data Interchange) connection for healthcare claims.
+    Sub-Group: Industry Protocols
 
     Parses X12 837 (claims), 835 (remittance), 270/271 (eligibility) files.
 
@@ -356,6 +358,7 @@ class X12EDIConnection(SparkleConnection):
 class FIXProtocolConnection(SparkleConnection):
     """
     FIX (Financial Information eXchange) protocol connection.
+    Sub-Group: Industry Protocols
 
     Parses FIX protocol messages (4.2, 4.4, 5.0) used in trading systems.
 
@@ -482,6 +485,7 @@ class FIXProtocolConnection(SparkleConnection):
 class SWIFTConnection(SparkleConnection):
     """
     SWIFT (Society for Worldwide Interbank Financial Telecommunication) connection.
+    Sub-Group: Industry Protocols
 
     Parses SWIFT MT (Message Type) and MX (ISO 20022 XML) messages.
 
@@ -635,6 +639,7 @@ class SWIFTConnection(SparkleConnection):
 class AWSHealthLakeConnection(FHIRConnection):
     """
     AWS HealthLake connection (FHIR-based healthcare data store).
+    Sub-Group: Industry Protocols
 
     AWS HealthLake is a FHIR R4 compliant service for healthcare data.
     Extends FHIRConnection with AWS-specific authentication.

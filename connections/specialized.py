@@ -15,6 +15,7 @@ from .factory import register_connection
 class SFTPConnection(SparkleConnection):
     """
     SFTP connection for secure file transfer.
+    Sub-Group: Specialized
 
     Example config (config/connections/sftp/prod.json):
         {
@@ -133,6 +134,7 @@ class SFTPConnection(SparkleConnection):
 class FTPConnection(SparkleConnection):
     """
     FTP connection for file transfer.
+    Sub-Group: Specialized
 
     Example config:
         {
@@ -172,6 +174,7 @@ class FTPConnection(SparkleConnection):
 class SMTPConnection(SparkleConnection):
     """
     SMTP connection for sending emails.
+    Sub-Group: Specialized
 
     Example config:
         {
@@ -264,6 +267,7 @@ class SMTPConnection(SparkleConnection):
 class LDAPConnection(SparkleConnection):
     """
     LDAP connection for directory services.
+    Sub-Group: Specialized
 
     Example config:
         {
@@ -304,6 +308,7 @@ class LDAPConnection(SparkleConnection):
 class SalesforceConnection(SparkleConnection):
     """
     Salesforce connection via Bulk API.
+    Sub-Group: Specialized
 
     Example config:
         {
@@ -400,6 +405,7 @@ class SalesforceConnection(SparkleConnection):
 class SAPConnection(SparkleConnection):
     """
     SAP ERP connection (generic adapter).
+    Sub-Group: Specialized
 
     Example config:
         {
@@ -435,6 +441,7 @@ class SAPConnection(SparkleConnection):
 class JiraConnection(SparkleConnection):
     """
     Jira connection via REST API.
+    Sub-Group: Specialized
 
     Example config:
         {
@@ -472,6 +479,7 @@ class JiraConnection(SparkleConnection):
 class SlackConnection(SparkleConnection):
     """
     Slack connection for notifications.
+    Sub-Group: Specialized
 
     Example config:
         {

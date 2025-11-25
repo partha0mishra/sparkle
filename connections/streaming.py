@@ -16,6 +16,7 @@ from .factory import register_connection
 class KafkaConnection(StreamingConnection):
     """
     Apache Kafka connection for streaming and batch reads.
+    Sub-Group: Streaming & Messaging
 
     Example config (config/connections/kafka/prod.json):
         {
@@ -157,6 +158,7 @@ class KafkaConnection(StreamingConnection):
 class KinesisConnection(StreamingConnection):
     """
     AWS Kinesis connection for streaming data.
+    Sub-Group: Streaming & Messaging
 
     Example config:
         {
@@ -217,6 +219,7 @@ class KinesisConnection(StreamingConnection):
 class EventHubConnection(StreamingConnection):
     """
     Azure Event Hubs connection.
+    Sub-Group: Streaming & Messaging
 
     Example config:
         {
@@ -275,6 +278,7 @@ class EventHubConnection(StreamingConnection):
 class PubSubConnection(StreamingConnection):
     """
     Google Cloud Pub/Sub connection.
+    Sub-Group: Streaming & Messaging
 
     Example config:
         {
@@ -324,6 +328,7 @@ class PubSubConnection(StreamingConnection):
 class PulsarConnection(StreamingConnection):
     """
     Apache Pulsar connection.
+    Sub-Group: Streaming & Messaging
 
     Example config:
         {
@@ -374,6 +379,7 @@ class PulsarConnection(StreamingConnection):
 class RabbitMQConnection(StreamingConnection):
     """
     RabbitMQ connection.
+    Sub-Group: Streaming & Messaging
 
     Example config:
         {
@@ -422,6 +428,7 @@ class RabbitMQConnection(StreamingConnection):
 class SQSConnection(StreamingConnection):
     """
     Amazon SQS connection.
+    Sub-Group: Streaming & Messaging
 
     Example config:
         {
@@ -467,6 +474,7 @@ class SQSConnection(StreamingConnection):
 class ServiceBusConnection(StreamingConnection):
     """
     Azure Service Bus connection.
+    Sub-Group: Streaming & Messaging
 
     Example config:
         {
@@ -509,6 +517,7 @@ class ServiceBusConnection(StreamingConnection):
 class MQTTConnection(StreamingConnection):
     """
     MQTT (Message Queuing Telemetry Transport) connection for IoT streaming.
+    Sub-Group: Streaming & Messaging
     
     Uses Bahir MQTT connector or Kafka bridge pattern.
     
@@ -685,6 +694,7 @@ class MQTTConnection(StreamingConnection):
 class NATSJetStreamConnection(StreamingConnection):
     """
     NATS JetStream connection for cloud-native messaging.
+    Sub-Group: Streaming & Messaging
     
     NATS is a simple, secure, and high-performance messaging system.
     JetStream adds streaming, persistence, and exactly-once semantics.

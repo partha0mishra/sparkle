@@ -26,10 +26,8 @@ export function Canvas() {
         ...connection,
         type: 'smoothstep',
         animated: true,
-        markerEnd: {
-          type: 'arrowclosed' as const,
-          color: '#6b7280',
-        },
+        markerEnd: 'arrowclosed',
+        style: { stroke: '#6b7280' },
       };
       addEdgeToStore(newEdge);
     },

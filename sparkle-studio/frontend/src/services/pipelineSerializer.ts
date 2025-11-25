@@ -71,10 +71,8 @@ export function fromBackendFormat(pipeline: Pipeline): {
     type: edge.type || 'smoothstep',
     animated: edge.animated !== undefined ? edge.animated : true,
     label: edge.label,
-    markerEnd: {
-      type: 'arrowclosed' as const,
-      color: '#6b7280',
-    },
+    markerEnd: 'arrowclosed',
+    style: { stroke: '#6b7280' },
   }));
 
   return {

@@ -74,8 +74,8 @@ export function ExecutionPanel({ pipelineName, onClose }: ExecutionPanelProps) {
           break;
 
         case 'error':
-          setError(message.data.message || message.message);
-          addLog(`ERROR: ${message.data.message || message.message}`);
+          setError(message.data.message || 'An error occurred');
+          addLog(`ERROR: ${message.data.message || 'An error occurred'}`);
           break;
 
         case 'complete':

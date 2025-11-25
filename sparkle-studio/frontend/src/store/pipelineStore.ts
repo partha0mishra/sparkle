@@ -37,7 +37,7 @@ interface PipelineState {
   setPipeline: (pipeline: Pipeline, name: string) => void;
   setNodes: (nodes: Node[]) => void;
   setEdges: (edges: Edge[]) => void;
-  addEdge: (connection: Connection) => void;
+  addEdge: (connection: Connection | Edge) => void;
   onNodesChange: OnNodesChange;
   onEdgesChange: OnEdgesChange;
   setSelectedNode: (node: Node | null) => void;

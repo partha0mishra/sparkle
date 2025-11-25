@@ -1,11 +1,11 @@
-# FastAPI and server
-fastapi==0.109.0
-uvicorn[standard]==0.27.0
-python-multipart==0.0.6
+# FastAPI and server (updated for Python 3.13 support)
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+python-multipart==0.0.18
 
-# Pydantic and settings
-pydantic==2.5.3
-pydantic-settings==2.1.0
+# Pydantic and settings (updated for Python 3.13 support)
+pydantic==2.10.3
+pydantic-settings==2.6.1
 
 # Git operations
 gitpython==3.1.40
@@ -25,7 +25,7 @@ passlib[bcrypt]==1.7.4
 pyyaml==6.0.1
 
 # JSON Schema validation (Phase 2)
-jsonschema==4.20.0
+jsonschema==4.23.0
 
 # Development
 python-dotenv==1.0.0

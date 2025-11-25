@@ -22,7 +22,16 @@ export function Canvas() {
 
   const onConnect = useCallback(
     (connection: Connection) => {
-      addEdgeToStore(connection);
+      const newEdge = {
+        ...connection,
+        type: 'smoothstep',
+        animated: true,
+        markerEnd: {
+          type: 'arrowclosed' as const,
+          color: '#6b7280',
+        },
+      };
+      addEdgeToStore(newEdge);
     },
     [addEdgeToStore]
   );

@@ -2,23 +2,25 @@
  * Component library sidebar with drag & drop and collapsible sections.
  */
 import React, { useMemo, useState } from 'react';
-import { Database, Download, Zap, Brain, Upload, Search, ChevronDown, ChevronRight } from 'lucide-react';
+import { Database, Download, Zap, Brain, Upload, Search, ChevronDown, ChevronRight, Plug } from 'lucide-react';
 import { useComponents } from '@/hooks/useComponents';
 import { usePipelineStore } from '@/store/pipelineStore';
 import type { ComponentMetadata } from '@/types/component';
 
 const categoryIcons = {
-  sources: Download,
-  transformers: Zap,
+  source: Plug,
+  ingestor: Download,
+  transformer: Zap,
   ml: Brain,
-  sinks: Upload,
+  destination: Upload,
 };
 
 const categoryColors = {
-  sources: 'text-green-500',
-  transformers: 'text-purple-500',
+  source: 'text-blue-500',
+  ingestor: 'text-green-500',
+  transformer: 'text-purple-500',
   ml: 'text-orange-500',
-  sinks: 'text-red-500',
+  destination: 'text-red-500',
 };
 
 interface CollapsibleSectionProps {
@@ -59,14 +61,15 @@ export function Sidebar() {
   const [searchQuery, setSearchQuery] = React.useState('');
   const { addNode } = usePipelineStore();
 
-  // Reorganize components into Sources, Transformers, ML, and Sinks
+  // Reorganize components into Source, Ingestor, Transformer, ML, and Destination
   const organizedSections = useMemo(() => {
-    if (!components) return { sources: [], transformers: [], ml: [], sinks: [] };
+    if (!components) return { source: [], ingestor: [], transformer: [], ml: [], destination: [] };
 
-    const sources: ComponentMetadata[] = [];
-    const transformers: ComponentMetadata[] = [];
+    const source: ComponentMetadata[] = [];
+    const ingestor: ComponentMetadata[] = [];
+    const transformer: ComponentMetadata[] = [];
     const ml: ComponentMetadata[] = [];
-    const sinks: ComponentMetadata[] = [];
+    const destination: ComponentMetadata[] = [];
 
     components.groups.forEach((group) => {
       group.components.forEach((component) => {
@@ -81,20 +84,22 @@ export function Sidebar() {
           if (!matches) return;
         }
 
-        // Categorize components
-        if (group.category === 'connection' || group.category === 'ingestor') {
-          sources.push(component);
+        // Categorize components into 5 sections
+        if (group.category === 'connection') {
+          source.push(component);
+        } else if (group.category === 'ingestor') {
+          ingestor.push(component);
         } else if (group.category === 'transformer') {
-          transformers.push(component);
+          transformer.push(component);
         } else if (group.category === 'ml') {
           ml.push(component);
         } else if (group.category === 'sink') {
-          sinks.push(component);
+          destination.push(component);
         }
       });
     });
 
-    return { sources, transformers, ml, sinks };
+    return { source, ingestor, transformer, ml, destination };
   }, [components, searchQuery]);
 
   const onDragStart = (event: React.DragEvent, component: ComponentMetadata) => {
@@ -134,10 +139,11 @@ export function Sidebar() {
   }
 
   const totalComponents =
-    organizedSections.sources.length +
-    organizedSections.transformers.length +
+    organizedSections.source.length +
+    organizedSections.ingestor.length +
+    organizedSections.transformer.length +
     organizedSections.ml.length +
-    organizedSections.sinks.length;
+    organizedSections.destination.length;
 
   if (!components || totalComponents === 0) {
     return (
@@ -172,16 +178,16 @@ export function Sidebar() {
 
       {/* Component List with Collapsible Sections */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {/* Sources Section */}
-        {organizedSections.sources.length > 0 && (
+        {/* Source Section */}
+        {organizedSections.source.length > 0 && (
           <CollapsibleSection
-            title="Sources"
-            icon={categoryIcons.sources}
-            count={organizedSections.sources.length}
-            color={categoryColors.sources}
+            title="Source"
+            icon={categoryIcons.source}
+            count={organizedSections.source.length}
+            color={categoryColors.source}
             defaultOpen={true}
           >
-            {organizedSections.sources.map((component) => (
+            {organizedSections.source.map((component) => (
               <div
                 key={component.name}
                 draggable
@@ -189,7 +195,7 @@ export function Sidebar() {
                 className="p-3 rounded-md border border-border bg-background hover:bg-accent cursor-move transition-colors"
               >
                 <div className="flex items-center gap-2">
-                  <Database className="w-4 h-4 text-green-500" />
+                  <Plug className="w-4 h-4 text-blue-500" />
                   <div className="font-medium text-sm">{component.display_name}</div>
                 </div>
                 {component.description && (
@@ -214,16 +220,58 @@ export function Sidebar() {
           </CollapsibleSection>
         )}
 
-        {/* Transformers Section */}
-        {organizedSections.transformers.length > 0 && (
+        {/* Ingestor Section */}
+        {organizedSections.ingestor.length > 0 && (
           <CollapsibleSection
-            title="Transformers"
-            icon={categoryIcons.transformers}
-            count={organizedSections.transformers.length}
-            color={categoryColors.transformers}
+            title="Ingestor"
+            icon={categoryIcons.ingestor}
+            count={organizedSections.ingestor.length}
+            color={categoryColors.ingestor}
             defaultOpen={true}
           >
-            {organizedSections.transformers.map((component) => (
+            {organizedSections.ingestor.map((component) => (
+              <div
+                key={component.name}
+                draggable
+                onDragStart={(e) => onDragStart(e, component)}
+                className="p-3 rounded-md border border-border bg-background hover:bg-accent cursor-move transition-colors"
+              >
+                <div className="flex items-center gap-2">
+                  <Download className="w-4 h-4 text-green-500" />
+                  <div className="font-medium text-sm">{component.display_name}</div>
+                </div>
+                {component.description && (
+                  <div className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                    {component.description}
+                  </div>
+                )}
+                <div className="flex gap-1 mt-2">
+                  {component.is_streaming && (
+                    <span className="text-xs px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-500">
+                      Streaming
+                    </span>
+                  )}
+                  {component.supports_incremental && (
+                    <span className="text-xs px-1.5 py-0.5 rounded bg-green-500/20 text-green-500">
+                      Incremental
+                    </span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </CollapsibleSection>
+        )}
+
+        {/* Transformer Section */}
+        {organizedSections.transformer.length > 0 && (
+          <CollapsibleSection
+            title="Transformer"
+            icon={categoryIcons.transformer}
+            count={organizedSections.transformer.length}
+            color={categoryColors.transformer}
+            defaultOpen={true}
+          >
+            {organizedSections.transformer.map((component) => (
               <div
                 key={component.name}
                 draggable
@@ -298,16 +346,16 @@ export function Sidebar() {
           </CollapsibleSection>
         )}
 
-        {/* Sinks Section */}
-        {organizedSections.sinks.length > 0 && (
+        {/* Destination Section */}
+        {organizedSections.destination.length > 0 && (
           <CollapsibleSection
-            title="Sinks"
-            icon={categoryIcons.sinks}
-            count={organizedSections.sinks.length}
-            color={categoryColors.sinks}
+            title="Destination"
+            icon={categoryIcons.destination}
+            count={organizedSections.destination.length}
+            color={categoryColors.destination}
             defaultOpen={true}
           >
-            {organizedSections.sinks.map((component) => (
+            {organizedSections.destination.map((component) => (
               <div
                 key={component.name}
                 draggable

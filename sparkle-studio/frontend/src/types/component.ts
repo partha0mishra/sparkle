@@ -11,6 +11,7 @@ export interface ComponentMetadata {
   description?: string;
   icon?: string;
   tags: string[];
+  sub_group?: string;
   is_streaming: boolean;
   supports_incremental: boolean;
 }
@@ -22,6 +23,7 @@ export interface ComponentManifest {
   description?: string;
   icon?: string;
   tags: string[];
+  sub_group?: string;
   config_schema: Record<string, any>;
   sample_config: Record<string, any>;
   has_code_editor: boolean;
@@ -37,6 +39,7 @@ export interface ComponentGroup {
   icon?: string;
   count: number;
   components: ComponentMetadata[];
+  sub_groups?: Record<string, ComponentMetadata[]>;
 }
 
 export interface ComponentListResponse {

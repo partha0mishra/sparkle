@@ -48,12 +48,21 @@ class ComponentService:
                 for manifest in components_dict.values()
             ]
 
+            # Organize components by sub-group
+            sub_groups_dict = {}
+            for metadata in component_metadata_list:
+                sub_group_name = metadata.sub_group or "Other"
+                if sub_group_name not in sub_groups_dict:
+                    sub_groups_dict[sub_group_name] = []
+                sub_groups_dict[sub_group_name].append(metadata)
+
             group = ComponentGroup(
                 category=category.value,
                 display_name=self._category_display_name(category),
                 icon=self._category_icon(category),
                 count=len(component_metadata_list),
                 components=component_metadata_list,
+                sub_groups=sub_groups_dict,
             )
             groups.append(group)
             total_count += len(component_metadata_list)
@@ -318,6 +327,7 @@ class ComponentService:
             description=manifest.description,
             icon=manifest.icon,
             tags=manifest.tags or [],
+            sub_group=manifest.sub_group,
             config_schema=manifest.config_schema or {},
             sample_config=manifest.sample_config or {},
             has_code_editor=manifest.has_code_editor,
@@ -336,6 +346,7 @@ class ComponentService:
             description=manifest.description,
             icon=manifest.icon,
             tags=manifest.tags or [],
+            sub_group=manifest.sub_group,
             is_streaming=manifest.is_streaming,
             supports_incremental=manifest.supports_incremental,
         )

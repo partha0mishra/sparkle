@@ -35,6 +35,7 @@ class ComponentManifest:
     description: Optional[str] = None
     icon: Optional[str] = None
     tags: List[str] = None
+    sub_group: Optional[str] = None  # Sub-group for organizing components (e.g., "Cloud Object Storage")
 
     # Configuration
     config_schema: Dict[str, Any] = None
@@ -167,6 +168,7 @@ class ComponentRegistry:
         description = self._extract_description(cls)
         icon = self._extract_icon(cls, category)
         tags = self._extract_tags(cls)
+        sub_group = self._extract_sub_group(cls)
 
         # Extract config schema
         try:
@@ -195,6 +197,7 @@ class ComponentRegistry:
             description=description,
             icon=icon,
             tags=tags,
+            sub_group=sub_group,
             config_schema=config_schema,
             sample_config=sample_config,
             has_code_editor=has_code_editor,
@@ -218,6 +221,7 @@ class ComponentRegistry:
         description = self._extract_description(func)
         icon = self._extract_icon(func, category)
         tags = self._extract_tags(func)
+        sub_group = self._extract_sub_group(func)
 
         # Extract config schema
         try:
@@ -241,6 +245,7 @@ class ComponentRegistry:
             description=description,
             icon=icon,
             tags=tags,
+            sub_group=sub_group,
             config_schema=config_schema,
             sample_config=sample_config,
             has_code_editor=False,
@@ -288,6 +293,14 @@ class ComponentRegistry:
                     tags = [t.strip() for t in tags_str.split(",")]
                     break
         return tags
+
+    def _extract_sub_group(self, obj: Any) -> Optional[str]:
+        """Extract sub-group from docstring."""
+        if obj.__doc__:
+            for line in obj.__doc__.split("\n"):
+                if line.strip().startswith("Sub-Group:"):
+                    return line.split("Sub-Group:")[1].strip()
+        return None
 
     def _has_custom_code_support(self, cls: type) -> bool:
         """Check if component supports custom code."""

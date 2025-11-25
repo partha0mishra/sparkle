@@ -29,6 +29,7 @@ class ComponentManifestSchema(BaseModel):
     description: Optional[str] = Field(None, description="Component description")
     icon: Optional[str] = Field(None, description="Icon name for UI")
     tags: list[str] = Field(default_factory=list, description="Tags for search and categorization")
+    sub_group: Optional[str] = Field(None, description="Sub-group for organizing components (e.g., 'Cloud Object Storage')")
 
     # Configuration
     config_schema: dict[str, Any] = Field(
@@ -70,6 +71,7 @@ class ComponentMetadata(BaseModel):
     description: Optional[str] = None
     icon: Optional[str] = None
     tags: list[str] = []
+    sub_group: Optional[str] = None
     is_streaming: bool = False
     supports_incremental: bool = False
 
@@ -109,6 +111,7 @@ class ComponentGroup(BaseModel):
     icon: Optional[str] = None
     count: int
     components: list[ComponentMetadata] = []
+    sub_groups: dict[str, list[ComponentMetadata]] = {}  # Organized by sub-group
 
     class Config:
         use_enum_values = True

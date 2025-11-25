@@ -61,42 +61,82 @@ export function Sidebar() {
   const [searchQuery, setSearchQuery] = React.useState('');
   const { addNode } = usePipelineStore();
 
-  // Reorganize components into Source, Ingestor, Transformer, ML, and Destination
+  // Reorganize components into Source, Ingestor, Transformer, ML, and Destination with sub-groups
   const organizedSections = useMemo(() => {
-    if (!components) return { source: [], ingestor: [], transformer: [], ml: [], destination: [] };
+    if (!components) return { source: {}, ingestor: {}, transformer: {}, ml: {}, destination: {} };
 
-    const source: ComponentMetadata[] = [];
-    const ingestor: ComponentMetadata[] = [];
-    const transformer: ComponentMetadata[] = [];
-    const ml: ComponentMetadata[] = [];
-    const destination: ComponentMetadata[] = [];
+    const source: Record<string, ComponentMetadata[]> = {};
+    const ingestor: Record<string, ComponentMetadata[]> = {};
+    const transformer: Record<string, ComponentMetadata[]> = {};
+    const ml: Record<string, ComponentMetadata[]> = {};
+    const destination: Record<string, ComponentMetadata[]> = {};
 
     components.groups.forEach((group) => {
-      group.components.forEach((component) => {
-        // Filter by search query
-        if (searchQuery) {
-          const searchLower = searchQuery.toLowerCase();
-          const matches =
-            component.display_name.toLowerCase().includes(searchLower) ||
-            component.description?.toLowerCase().includes(searchLower) ||
-            component.tags.some((t) => t.toLowerCase().includes(searchLower));
+      // Use sub_groups if available, otherwise organize components directly
+      const subGroups = group.sub_groups || {};
+      const hasSubGroups = Object.keys(subGroups).length > 0;
 
-          if (!matches) return;
-        }
+      if (hasSubGroups) {
+        // Process sub-grouped components
+        Object.entries(subGroups).forEach(([subGroupName, subGroupComponents]) => {
+          subGroupComponents.forEach((component) => {
+            // Filter by search query
+            if (searchQuery) {
+              const searchLower = searchQuery.toLowerCase();
+              const matches =
+                component.display_name.toLowerCase().includes(searchLower) ||
+                component.description?.toLowerCase().includes(searchLower) ||
+                component.tags.some((t) => t.toLowerCase().includes(searchLower));
 
-        // Categorize components into 5 sections
-        if (group.category === 'connection') {
-          source.push(component);
-        } else if (group.category === 'ingestor') {
-          ingestor.push(component);
-        } else if (group.category === 'transformer') {
-          transformer.push(component);
-        } else if (group.category === 'ml') {
-          ml.push(component);
-        } else if (group.category === 'sink') {
-          destination.push(component);
-        }
-      });
+              if (!matches) return;
+            }
+
+            // Categorize into sections
+            let targetSection: Record<string, ComponentMetadata[]> | null = null;
+            if (group.category === 'connection') targetSection = source;
+            else if (group.category === 'ingestor') targetSection = ingestor;
+            else if (group.category === 'transformer') targetSection = transformer;
+            else if (group.category === 'ml') targetSection = ml;
+            else if (group.category === 'sink') targetSection = destination;
+
+            if (targetSection) {
+              if (!targetSection[subGroupName]) {
+                targetSection[subGroupName] = [];
+              }
+              targetSection[subGroupName].push(component);
+            }
+          });
+        });
+      } else {
+        // No sub-groups - organize flat with "Other" as default sub-group
+        group.components.forEach((component) => {
+          // Filter by search query
+          if (searchQuery) {
+            const searchLower = searchQuery.toLowerCase();
+            const matches =
+              component.display_name.toLowerCase().includes(searchLower) ||
+              component.description?.toLowerCase().includes(searchLower) ||
+              component.tags.some((t) => t.toLowerCase().includes(searchLower));
+
+            if (!matches) return;
+          }
+
+          const subGroupName = component.sub_group || 'Other';
+          let targetSection: Record<string, ComponentMetadata[]> | null = null;
+          if (group.category === 'connection') targetSection = source;
+          else if (group.category === 'ingestor') targetSection = ingestor;
+          else if (group.category === 'transformer') targetSection = transformer;
+          else if (group.category === 'ml') targetSection = ml;
+          else if (group.category === 'sink') targetSection = destination;
+
+          if (targetSection) {
+            if (!targetSection[subGroupName]) {
+              targetSection[subGroupName] = [];
+            }
+            targetSection[subGroupName].push(component);
+          }
+        });
+      }
     });
 
     return { source, ingestor, transformer, ml, destination };
@@ -114,6 +154,64 @@ export function Sidebar() {
       })
     );
     event.dataTransfer.effectAllowed = 'move';
+  };
+
+  // Helper function to render component card
+  const renderComponentCard = (component: ComponentMetadata, iconComponent: React.ElementType, iconColor: string) => (
+    <div
+      key={component.name}
+      draggable
+      onDragStart={(e) => onDragStart(e, component)}
+      className="p-3 rounded-md border border-border bg-background hover:bg-accent cursor-move transition-colors"
+    >
+      <div className="flex items-center gap-2">
+        {React.createElement(iconComponent, { className: `w-4 h-4 ${iconColor}` })}
+        <div className="font-medium text-sm">{component.display_name}</div>
+      </div>
+      {component.description && (
+        <div className="text-xs text-muted-foreground mt-1 line-clamp-2">
+          {component.description}
+        </div>
+      )}
+      <div className="flex gap-1 mt-2">
+        {component.is_streaming && (
+          <span className="text-xs px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-500">
+            Streaming
+          </span>
+        )}
+        {component.supports_incremental && (
+          <span className="text-xs px-1.5 py-0.5 rounded bg-green-500/20 text-green-500">
+            Incremental
+          </span>
+        )}
+      </div>
+    </div>
+  );
+
+  // Helper to render components grouped by sub-group
+  const renderComponentsWithSubGroups = (
+    subGroups: Record<string, ComponentMetadata[]>,
+    iconComponent: React.ElementType,
+    iconColor: string
+  ) => {
+    const subGroupNames = Object.keys(subGroups).sort();
+
+    // If only one sub-group called "Other", render flat without sub-group headers
+    if (subGroupNames.length === 1 && subGroupNames[0] === 'Other') {
+      return subGroups['Other'].map((component) => renderComponentCard(component, iconComponent, iconColor));
+    }
+
+    // Render with sub-group headers
+    return subGroupNames.map((subGroupName) => (
+      <div key={subGroupName} className="mb-3">
+        <div className="text-xs font-semibold text-muted-foreground mb-2 px-2">
+          {subGroupName} ({subGroups[subGroupName].length})
+        </div>
+        <div className="space-y-1">
+          {subGroups[subGroupName].map((component) => renderComponentCard(component, iconComponent, iconColor))}
+        </div>
+      </div>
+    ));
   };
 
   if (isLoading) {
@@ -139,11 +237,11 @@ export function Sidebar() {
   }
 
   const totalComponents =
-    organizedSections.source.length +
-    organizedSections.ingestor.length +
-    organizedSections.transformer.length +
-    organizedSections.ml.length +
-    organizedSections.destination.length;
+    Object.values(organizedSections.source).flat().length +
+    Object.values(organizedSections.ingestor).flat().length +
+    Object.values(organizedSections.transformer).flat().length +
+    Object.values(organizedSections.ml).flat().length +
+    Object.values(organizedSections.destination).flat().length;
 
   if (!components || totalComponents === 0) {
     return (
@@ -179,212 +277,67 @@ export function Sidebar() {
       {/* Component List with Collapsible Sections */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {/* Source Section */}
-        {organizedSections.source.length > 0 && (
+        {Object.keys(organizedSections.source).length > 0 && (
           <CollapsibleSection
             title="Source"
             icon={categoryIcons.source}
-            count={organizedSections.source.length}
+            count={Object.values(organizedSections.source).flat().length}
             color={categoryColors.source}
             defaultOpen={true}
           >
-            {organizedSections.source.map((component) => (
-              <div
-                key={component.name}
-                draggable
-                onDragStart={(e) => onDragStart(e, component)}
-                className="p-3 rounded-md border border-border bg-background hover:bg-accent cursor-move transition-colors"
-              >
-                <div className="flex items-center gap-2">
-                  <Plug className="w-4 h-4 text-blue-500" />
-                  <div className="font-medium text-sm">{component.display_name}</div>
-                </div>
-                {component.description && (
-                  <div className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                    {component.description}
-                  </div>
-                )}
-                <div className="flex gap-1 mt-2">
-                  {component.is_streaming && (
-                    <span className="text-xs px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-500">
-                      Streaming
-                    </span>
-                  )}
-                  {component.supports_incremental && (
-                    <span className="text-xs px-1.5 py-0.5 rounded bg-green-500/20 text-green-500">
-                      Incremental
-                    </span>
-                  )}
-                </div>
-              </div>
-            ))}
+            {renderComponentsWithSubGroups(organizedSections.source, Plug, 'text-blue-500')}
           </CollapsibleSection>
         )}
 
         {/* Ingestor Section */}
-        {organizedSections.ingestor.length > 0 && (
+        {Object.keys(organizedSections.ingestor).length > 0 && (
           <CollapsibleSection
             title="Ingestor"
             icon={categoryIcons.ingestor}
-            count={organizedSections.ingestor.length}
+            count={Object.values(organizedSections.ingestor).flat().length}
             color={categoryColors.ingestor}
             defaultOpen={true}
           >
-            {organizedSections.ingestor.map((component) => (
-              <div
-                key={component.name}
-                draggable
-                onDragStart={(e) => onDragStart(e, component)}
-                className="p-3 rounded-md border border-border bg-background hover:bg-accent cursor-move transition-colors"
-              >
-                <div className="flex items-center gap-2">
-                  <Download className="w-4 h-4 text-green-500" />
-                  <div className="font-medium text-sm">{component.display_name}</div>
-                </div>
-                {component.description && (
-                  <div className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                    {component.description}
-                  </div>
-                )}
-                <div className="flex gap-1 mt-2">
-                  {component.is_streaming && (
-                    <span className="text-xs px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-500">
-                      Streaming
-                    </span>
-                  )}
-                  {component.supports_incremental && (
-                    <span className="text-xs px-1.5 py-0.5 rounded bg-green-500/20 text-green-500">
-                      Incremental
-                    </span>
-                  )}
-                </div>
-              </div>
-            ))}
+            {renderComponentsWithSubGroups(organizedSections.ingestor, Download, 'text-green-500')}
           </CollapsibleSection>
         )}
 
         {/* Transformer Section */}
-        {organizedSections.transformer.length > 0 && (
+        {Object.keys(organizedSections.transformer).length > 0 && (
           <CollapsibleSection
             title="Transformer"
             icon={categoryIcons.transformer}
-            count={organizedSections.transformer.length}
+            count={Object.values(organizedSections.transformer).flat().length}
             color={categoryColors.transformer}
             defaultOpen={true}
           >
-            {organizedSections.transformer.map((component) => (
-              <div
-                key={component.name}
-                draggable
-                onDragStart={(e) => onDragStart(e, component)}
-                className="p-3 rounded-md border border-border bg-background hover:bg-accent cursor-move transition-colors"
-              >
-                <div className="flex items-center gap-2">
-                  <Zap className="w-4 h-4 text-purple-500" />
-                  <div className="font-medium text-sm">{component.display_name}</div>
-                </div>
-                {component.description && (
-                  <div className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                    {component.description}
-                  </div>
-                )}
-                <div className="flex gap-1 mt-2">
-                  {component.is_streaming && (
-                    <span className="text-xs px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-500">
-                      Streaming
-                    </span>
-                  )}
-                  {component.supports_incremental && (
-                    <span className="text-xs px-1.5 py-0.5 rounded bg-green-500/20 text-green-500">
-                      Incremental
-                    </span>
-                  )}
-                </div>
-              </div>
-            ))}
+            {renderComponentsWithSubGroups(organizedSections.transformer, Zap, 'text-purple-500')}
           </CollapsibleSection>
         )}
 
         {/* Machine Learning Section */}
-        {organizedSections.ml.length > 0 && (
+        {Object.keys(organizedSections.ml).length > 0 && (
           <CollapsibleSection
             title="Machine Learning"
             icon={categoryIcons.ml}
-            count={organizedSections.ml.length}
+            count={Object.values(organizedSections.ml).flat().length}
             color={categoryColors.ml}
             defaultOpen={true}
           >
-            {organizedSections.ml.map((component) => (
-              <div
-                key={component.name}
-                draggable
-                onDragStart={(e) => onDragStart(e, component)}
-                className="p-3 rounded-md border border-border bg-background hover:bg-accent cursor-move transition-colors"
-              >
-                <div className="flex items-center gap-2">
-                  <Brain className="w-4 h-4 text-orange-500" />
-                  <div className="font-medium text-sm">{component.display_name}</div>
-                </div>
-                {component.description && (
-                  <div className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                    {component.description}
-                  </div>
-                )}
-                <div className="flex gap-1 mt-2">
-                  {component.is_streaming && (
-                    <span className="text-xs px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-500">
-                      Streaming
-                    </span>
-                  )}
-                  {component.supports_incremental && (
-                    <span className="text-xs px-1.5 py-0.5 rounded bg-green-500/20 text-green-500">
-                      Incremental
-                    </span>
-                  )}
-                </div>
-              </div>
-            ))}
+            {renderComponentsWithSubGroups(organizedSections.ml, Brain, 'text-orange-500')}
           </CollapsibleSection>
         )}
 
         {/* Destination Section */}
-        {organizedSections.destination.length > 0 && (
+        {Object.keys(organizedSections.destination).length > 0 && (
           <CollapsibleSection
             title="Destination"
             icon={categoryIcons.destination}
-            count={organizedSections.destination.length}
+            count={Object.values(organizedSections.destination).flat().length}
             color={categoryColors.destination}
             defaultOpen={true}
           >
-            {organizedSections.destination.map((component) => (
-              <div
-                key={component.name}
-                draggable
-                onDragStart={(e) => onDragStart(e, component)}
-                className="p-3 rounded-md border border-border bg-background hover:bg-accent cursor-move transition-colors"
-              >
-                <div className="flex items-center gap-2">
-                  <Upload className="w-4 h-4 text-red-500" />
-                  <div className="font-medium text-sm">{component.display_name}</div>
-                </div>
-                {component.description && (
-                  <div className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                    {component.description}
-                  </div>
-                )}
-                <div className="flex gap-1 mt-2">
-                  {component.is_streaming && (
-                    <span className="text-xs px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-500">
-                      Streaming
-                    </span>
-                  )}
-                  {component.supports_incremental && (
-                    <span className="text-xs px-1.5 py-0.5 rounded bg-green-500/20 text-green-500">
-                      Incremental
-                    </span>
-                  )}
-                </div>
-              </div>
-            ))}
+            {renderComponentsWithSubGroups(organizedSections.destination, Upload, 'text-red-500')}
           </CollapsibleSection>
         )}
       </div>

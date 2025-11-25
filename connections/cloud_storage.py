@@ -16,6 +16,7 @@ from .factory import register_connection
 class S3Connection(CloudStorageConnection):
     """
     Amazon S3 connection.
+    Sub-Group: Cloud Object Storage
 
     Supports:
     - IAM role authentication (recommended)
@@ -111,6 +112,7 @@ class S3Connection(CloudStorageConnection):
 class ADLSGen2Connection(CloudStorageConnection):
     """
     Azure Data Lake Storage Gen2 connection.
+    Sub-Group: Cloud Object Storage
 
     Supports:
     - Managed identity (recommended in Azure)
@@ -209,6 +211,7 @@ class ADLSGen2Connection(CloudStorageConnection):
 class GCSConnection(CloudStorageConnection):
     """
     Google Cloud Storage connection.
+    Sub-Group: Cloud Object Storage
 
     Supports:
     - Service account key file
@@ -295,6 +298,7 @@ class GCSConnection(CloudStorageConnection):
 class HDFSConnection(CloudStorageConnection):
     """
     HDFS connection for on-premise Hadoop clusters.
+    Sub-Group: Cloud Object Storage
 
     Example config:
         {
@@ -357,6 +361,7 @@ class LocalFileSystemConnection(CloudStorageConnection):
 class S3CompatibleConnection(CloudStorageConnection):
     """
     S3-compatible storage (MinIO, Ceph, etc.).
+    Sub-Group: Cloud Object Storage
 
     Example config:
         {
@@ -412,6 +417,7 @@ class S3CompatibleConnection(CloudStorageConnection):
 class DatabricksVolumesConnection(CloudStorageConnection):
     """
     Databricks Volumes (Unity Catalog) and DBFS connection.
+    Sub-Group: Cloud Object Storage
 
     Supports:
     - Unity Catalog Volumes (/Volumes/catalog/schema/volume/)
@@ -502,6 +508,7 @@ class DatabricksVolumesConnection(CloudStorageConnection):
 class CloudflareR2Connection(S3CompatibleConnection):
     """
     Cloudflare R2 connection (S3-compatible).
+    Sub-Group: Cloud Object Storage
 
     Example config:
         {
@@ -525,6 +532,7 @@ class CloudflareR2Connection(S3CompatibleConnection):
 class WasabiConnection(S3CompatibleConnection):
     """
     Wasabi Cloud Storage connection (S3-compatible).
+    Sub-Group: Cloud Object Storage
 
     Example config:
         {
@@ -549,6 +557,7 @@ class WasabiConnection(S3CompatibleConnection):
 class BackblazeB2Connection(S3CompatibleConnection):
     """
     Backblaze B2 connection (S3-compatible).
+    Sub-Group: Cloud Object Storage
 
     Example config:
         {

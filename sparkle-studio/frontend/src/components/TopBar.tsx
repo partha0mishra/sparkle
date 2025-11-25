@@ -17,6 +17,7 @@ import { useGit } from '@/hooks/useGit';
 import { usePipeline } from '@/hooks/usePipeline';
 import { usePipelineStore } from '@/store/pipelineStore';
 import { cn } from '@/lib/utils';
+import { ExecutionPanel } from './ExecutionPanel';
 
 export function TopBar() {
   const { status, branches, commit, pull, isLoading } = useGit();
@@ -24,6 +25,7 @@ export function TopBar() {
   const { canUndo, canRedo, undo, redo } = usePipelineStore();
   const [commitMessage, setCommitMessage] = useState('');
   const [showCommitDialog, setShowCommitDialog] = useState(false);
+  const [showExecutionPanel, setShowExecutionPanel] = useState(false);
 
   const currentBranch = branches.find((b) => b.is_current);
 
@@ -136,13 +138,23 @@ export function TopBar() {
 
         {/* Run */}
         <button
+          onClick={() => setShowExecutionPanel(true)}
           className="flex items-center gap-2 px-3 py-1.5 text-sm rounded border border-green-500 text-green-500 hover:bg-green-500/10"
           title="Run pipeline"
+          disabled={!pipelineName}
         >
           <Play className="w-4 h-4" />
           Run
         </button>
       </div>
+
+      {/* Execution Panel */}
+      {showExecutionPanel && pipelineName && (
+        <ExecutionPanel
+          pipelineName={pipelineName}
+          onClose={() => setShowExecutionPanel(false)}
+        />
+      )}
 
       {/* Commit Dialog (Simple) */}
       {showCommitDialog && (

@@ -87,3 +87,99 @@ class DryRunResponse(BaseModel):
     total_execution_time_ms: float = 0
     success: bool
     error: Optional[str] = None
+
+
+# Phase 4: Enhanced execution tracking and real-time monitoring
+
+
+class NodeExecutionStatus(str, Enum):
+    """Node-level execution status."""
+    PENDING = "pending"
+    RUNNING = "running"
+    SUCCESS = "success"
+    FAILED = "failed"
+    SKIPPED = "skipped"
+
+
+class NodeExecutionInfo(BaseModel):
+    """Execution info for a single node in the pipeline."""
+    node_id: str
+    node_name: str
+    component_type: str
+    status: NodeExecutionStatus
+    start_time: Optional[datetime] = None
+    end_time: Optional[datetime] = None
+    duration_seconds: Optional[float] = None
+    rows_processed: Optional[int] = None
+    rows_written: Optional[int] = None
+    error: Optional[str] = None
+    progress_percent: float = 0.0
+
+
+class ExecutionMetrics(BaseModel):
+    """Aggregate execution metrics."""
+    total_rows_processed: int = 0
+    total_rows_written: int = 0
+    peak_memory_mb: float = 0.0
+    total_cpu_seconds: float = 0.0
+    data_read_mb: float = 0.0
+    data_written_mb: float = 0.0
+    num_tasks: int = 0
+    num_stages: int = 0
+
+
+class ExecutionProgress(BaseModel):
+    """Real-time execution progress."""
+    run_id: str
+    pipeline_name: str
+    status: ExecutionStatus
+    progress_percent: float = 0.0
+    current_node: Optional[str] = None
+    nodes: list[NodeExecutionInfo] = Field(default_factory=list)
+    elapsed_seconds: float = 0.0
+    estimated_remaining_seconds: Optional[float] = None
+
+
+class ExecutionLogEntry(BaseModel):
+    """Single log entry for WebSocket streaming."""
+    timestamp: datetime
+    level: str  # INFO, WARNING, ERROR, DEBUG
+    node_id: Optional[str] = None
+    node_name: Optional[str] = None
+    message: str
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class ExecutionListItem(BaseModel):
+    """Execution history list item."""
+    run_id: str
+    pipeline_name: str
+    status: ExecutionStatus
+    submitted_at: datetime
+    started_at: Optional[datetime] = None
+    completed_at: Optional[datetime] = None
+    duration_seconds: Optional[float] = None
+    dry_run: bool = False
+    error_message: Optional[str] = None
+
+
+class ExecutionListResponse(BaseModel):
+    """Paginated list of executions."""
+    executions: list[ExecutionListItem]
+    total: int
+    page: int = 1
+    page_size: int = 20
+
+
+class ExecutionStopRequest(BaseModel):
+    """Request to stop/cancel execution."""
+    run_id: str
+    force: bool = Field(False, description="Force kill (SIGKILL)")
+
+
+class WebSocketMessage(BaseModel):
+    """WebSocket message for real-time updates."""
+    type: str  # "log", "progress", "status", "error", "complete"
+    run_id: str
+    timestamp: datetime
+    data: dict[str, Any]

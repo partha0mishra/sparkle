@@ -2,7 +2,6 @@
  * Hook for managing pipelines - load, save, commit.
  */
 import { useState, useCallback } from 'react';
-import { useNodesState, useEdgesState } from 'reactflow';
 import api from '@/lib/api';
 import type { APIResponse } from '@/types/api';
 import type { Pipeline, PipelineListItem } from '@/types/pipeline';
@@ -18,10 +17,14 @@ export function usePipeline() {
     setSaving,
     isLoading,
     isSaving,
+    nodes,
+    edges,
+    setNodes,
+    setEdges,
+    addEdge,
+    onNodesChange,
+    onEdgesChange,
   } = usePipelineStore();
-
-  const [nodes, setNodes, onNodesChange] = useNodesState([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
   /**
    * List all pipelines.
@@ -161,6 +164,7 @@ export function usePipeline() {
     onEdgesChange,
     setNodes,
     setEdges,
+    addEdge,
 
     // Actions
     listPipelines,

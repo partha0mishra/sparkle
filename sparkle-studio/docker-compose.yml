@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # Sparkle Studio Backend
   studio-backend:
@@ -22,7 +20,7 @@ services:
       - SECRET_KEY=dev-secret-key-change-in-production
     volumes:
       # Mount Sparkle engine from host
-      - ../sparkle:/opt/sparkle:ro
+      - ../sparkle:/opt/sparkle/sparkle:ro
       # Mount Git repository (persistent)
       - ./data/git_repo:/app/git_repo
       # Mount config

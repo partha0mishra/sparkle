@@ -18,14 +18,13 @@ import { usePipeline } from '@/hooks/usePipeline';
 
 export function Canvas() {
   const { selectedNode, setSelectedNode, saveToHistory } = usePipelineStore();
-  const { nodes, edges, onNodesChange, onEdgesChange, setEdges } = usePipeline();
+  const { nodes, edges, onNodesChange, onEdgesChange, addEdge: addEdgeToStore } = usePipeline();
 
   const onConnect = useCallback(
     (connection: Connection) => {
-      setEdges((eds: Edge[]) => addEdge(connection, eds));
-      saveToHistory();
+      addEdgeToStore(connection);
     },
-    [setEdges, saveToHistory]
+    [addEdgeToStore]
   );
 
   const onNodeClick = useCallback(

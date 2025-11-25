@@ -1,8 +1,16 @@
-/**
- * Zustand store for pipeline state management with undo/redo.
- */
 import { create } from 'zustand';
-import { type Node, type Edge } from 'reactflow';
+import {
+  type Node,
+  type Edge,
+  type OnNodesChange,
+  type OnEdgesChange,
+  type NodeChange,
+  type EdgeChange,
+  type Connection,
+  applyNodeChanges,
+  applyEdgeChanges,
+  addEdge as reactFlowAddEdge,
+} from 'reactflow';
 import type { Pipeline, PipelineMetadata, PipelineConfig } from '@/types/pipeline';
 
 interface PipelineState {
@@ -29,6 +37,9 @@ interface PipelineState {
   setPipeline: (pipeline: Pipeline, name: string) => void;
   setNodes: (nodes: Node[]) => void;
   setEdges: (edges: Edge[]) => void;
+  addEdge: (connection: Connection) => void;
+  onNodesChange: OnNodesChange;
+  onEdgesChange: OnEdgesChange;
   setSelectedNode: (node: Node | null) => void;
   addNode: (node: Node) => void;
   updateNode: (id: string, data: Partial<Node['data']>) => void;
@@ -71,6 +82,24 @@ export const usePipelineStore = create<PipelineState>((set, get) => ({
 
   setEdges: (edges) => {
     set({ edges });
+  },
+
+  addEdge: (connection) => {
+    const { edges } = get();
+    set({ edges: reactFlowAddEdge(connection, edges) });
+    get().saveToHistory();
+  },
+
+  onNodesChange: (changes: NodeChange[]) => {
+    set({
+      nodes: applyNodeChanges(changes, get().nodes),
+    });
+  },
+
+  onEdgesChange: (changes: EdgeChange[]) => {
+    set({
+      edges: applyEdgeChanges(changes, get().edges),
+    });
   },
 
   setSelectedNode: (node) => {

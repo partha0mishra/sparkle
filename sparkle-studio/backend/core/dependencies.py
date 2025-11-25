@@ -34,15 +34,26 @@ def get_spark() -> SparkSession:
                 .getOrCreate()
             )
         else:
-            # Local Spark session
-            _spark_session = (
+            # Local Spark session with macOS compatibility
+            builder = (
                 SparkSession.builder
                 .appName(settings.SPARK_APP_NAME)
                 .master(settings.SPARK_MASTER)
-                .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension")
-                .config("spark.sql.catalog.spark_catalog", "org.apache.spark.sql.delta.catalog.DeltaCatalog")
-                .getOrCreate()
+                .config("spark.driver.bindAddress", "127.0.0.1")
+                .config("spark.driver.host", "127.0.0.1")
             )
+
+            # Try to add Delta Lake support (optional)
+            try:
+                builder = (
+                    builder
+                    .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension")
+                    .config("spark.sql.catalog.spark_catalog", "org.apache.spark.sql.delta.catalog.DeltaCatalog")
+                )
+            except Exception:
+                pass  # Delta Lake not available, continue without it
+
+            _spark_session = builder.getOrCreate()
 
     return _spark_session
 

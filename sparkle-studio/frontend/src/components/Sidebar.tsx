@@ -16,7 +16,7 @@ const categoryIcons = {
 };
 
 export function Sidebar() {
-  const { components, isLoading } = useComponents();
+  const { components, isLoading, error } = useComponents();
   const [searchQuery, setSearchQuery] = React.useState('');
   const { addNode } = usePipelineStore();
 
@@ -55,6 +55,34 @@ export function Sidebar() {
     return (
       <div className="w-80 border-r border-border bg-card p-4">
         <div className="text-sm text-muted-foreground">Loading components...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="w-80 border-r border-border bg-card p-4">
+        <div className="text-sm text-red-500">
+          <p className="font-semibold mb-2">Error loading components:</p>
+          <p className="text-xs">{error}</p>
+          <p className="text-xs mt-2 text-muted-foreground">
+            Check browser console for details
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!components || filteredGroups.length === 0) {
+    return (
+      <div className="w-80 border-r border-border bg-card p-4">
+        <h2 className="text-lg font-semibold mb-3">Components</h2>
+        <div className="text-sm text-muted-foreground">
+          {searchQuery ? 'No components match your search.' : 'No components available.'}
+          <p className="text-xs mt-2">
+            Backend: {import.meta.env.VITE_API_URL || 'http://localhost:8000'}
+          </p>
+        </div>
       </div>
     );
   }

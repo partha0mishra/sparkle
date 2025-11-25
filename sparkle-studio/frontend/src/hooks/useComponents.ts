@@ -13,21 +13,38 @@ import type {
 export function useComponents() {
   const [components, setComponents] = useState<ComponentListResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   /**
    * Fetch all components.
    */
   const fetchComponents = useCallback(async () => {
     setIsLoading(true);
+    setError(null);
     try {
+      console.log('[useComponents] Fetching from:', api.defaults.baseURL);
       const response = await api.get<APIResponse<ComponentListResponse>>('/components');
+      console.log('[useComponents] Response:', response.data);
+
       if (response.data.success && response.data.data) {
         setComponents(response.data.data);
+        console.log('[useComponents] Loaded components:', response.data.data);
         return response.data.data;
       }
+
+      const errorMsg = response.data.message || 'Failed to load components';
+      setError(errorMsg);
+      console.error('[useComponents] Error in response:', errorMsg);
       return null;
-    } catch (error) {
-      console.error('Error fetching components:', error);
+    } catch (err: any) {
+      const errorMessage = err.response?.data?.detail || err.message || 'Failed to connect to backend';
+      console.error('[useComponents] Error fetching components:', err);
+      console.error('[useComponents] Error details:', {
+        status: err.response?.status,
+        data: err.response?.data,
+        message: err.message,
+      });
+      setError(errorMessage);
       return null;
     } finally {
       setIsLoading(false);
@@ -101,6 +118,7 @@ export function useComponents() {
   return {
     components,
     isLoading,
+    error,
     fetchComponents,
     getComponent,
     validateConfig,

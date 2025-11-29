@@ -9,6 +9,9 @@ A comprehensive library of composable transformation functions organized into ca
 - Aggregation: Grouping, pivoting, window functions
 - Parsing: JSON/XML/nested structure handling
 - PII: Masking, tokenization, anonymization
+- DateTime: Date/time operations and conversions
+- CDC: Change Data Capture operations
+- Advanced: Complex patterns and advanced operations
 
 All transformers follow the pattern: (DataFrame, **kwargs) -> DataFrame
 and can be chained using DataFrame.transform().
@@ -57,6 +60,9 @@ from . import scd
 from . import aggregation
 from . import parsing
 from . import pii
+from . import datetime
+from . import cdc
+from . import advanced
 
 # Import commonly used transformers for direct access
 from .cleaning import (
@@ -75,7 +81,9 @@ from .cleaning import (
     deduplicate_array_column,
     remove_empty_arrays,
     clean_email_addresses,
-    clean_phone_numbers
+    clean_phone_numbers,
+    normalize_whitespace,
+    cap_numeric_values
 )
 
 from .enrichment import (
@@ -89,7 +97,11 @@ from .enrichment import (
     perform_lookup,
     add_age_from_birthdate,
     add_tenure_months,
-    add_business_key
+    add_business_key,
+    add_derived_flag,
+    add_string_metrics,
+    add_domain_from_email,
+    add_name_components
 )
 
 from .validation import (
@@ -99,14 +111,23 @@ from .validation import (
     enforce_not_null,
     validate_length,
     validate_pattern,
-    validate_range
+    validate_range,
+    validate_uniqueness,
+    validate_referential_integrity,
+    validate_enum_values,
+    check_data_quality,
+    validate_completeness
 )
 
 from .scd import (
     apply_scd_type1,
     apply_scd_type2,
     apply_scd_type3,
-    close_scd_records
+    close_scd_records,
+    detect_scd_changes,
+    merge_scd_type2,
+    get_scd_current_records,
+    get_scd_as_of_date
 )
 
 from .aggregation import (
@@ -118,7 +139,8 @@ from .aggregation import (
     add_percentile_rank,
     add_ntile,
     rollup_aggregation,
-    cube_aggregation
+    cube_aggregation,
+    add_cumulative_distribution
 )
 
 from .parsing import (
@@ -126,7 +148,16 @@ from .parsing import (
     extract_json_field,
     explode_array_column,
     split_delimited_column,
-    flatten_struct_column
+    flatten_struct_column,
+    parse_xml_column,
+    extract_map_keys_values,
+    explode_map_column,
+    parse_url_parameters,
+    flatten_nested_arrays,
+    parse_csv_column,
+    extract_regex_groups,
+    json_to_struct_array,
+    struct_to_json
 )
 
 from .pii import (
@@ -135,6 +166,50 @@ from .pii import (
     redact_email,
     anonymize_with_lookup,
     remove_pii_columns
+)
+
+from .datetime import (
+    parse_date_string,
+    parse_timestamp_string,
+    convert_unix_timestamp,
+    format_datetime,
+    extract_date_parts,
+    add_days_to_date,
+    add_months_to_date,
+    calculate_date_diff,
+    get_next_day_of_week,
+    get_last_day_of_month,
+    truncate_to_period,
+    add_age_category
+)
+
+from .cdc import (
+    detect_changes,
+    apply_cdc_merge,
+    add_cdc_metadata,
+    apply_soft_delete,
+    merge_incremental_updates,
+    capture_before_after,
+    apply_delta_updates,
+    track_row_versions,
+    identify_latest_records
+)
+
+from .advanced import (
+    sample_data,
+    unpivot_columns,
+    create_sessionization,
+    apply_conditional_logic,
+    create_composite_key,
+    broadcast_join_small_table,
+    calculate_running_statistics,
+    create_bins,
+    create_array_column,
+    create_map_column,
+    rank_within_groups,
+    calculate_percentiles,
+    apply_lookup_with_fallback,
+    calculate_percent_change
 )
 
 
@@ -157,8 +232,11 @@ __all__ = [
     "aggregation",
     "parsing",
     "pii",
+    "datetime",
+    "cdc",
+    "advanced",
 
-    # Cleaning transformers
+    # Cleaning transformers (18)
     "drop_exact_duplicates",
     "drop_duplicates_by_key",
     "standardize_nulls",
@@ -175,8 +253,10 @@ __all__ = [
     "remove_empty_arrays",
     "clean_email_addresses",
     "clean_phone_numbers",
+    "normalize_whitespace",
+    "cap_numeric_values",
 
-    # Enrichment transformers
+    # Enrichment transformers (15)
     "add_audit_columns",
     "add_ingestion_metadata",
     "add_surrogate_key",
@@ -188,8 +268,12 @@ __all__ = [
     "add_age_from_birthdate",
     "add_tenure_months",
     "add_business_key",
+    "add_derived_flag",
+    "add_string_metrics",
+    "add_domain_from_email",
+    "add_name_components",
 
-    # Validation transformers
+    # Validation transformers (12)
     "add_validation_flags",
     "mark_invalid_rows",
     "split_valid_invalid",
@@ -197,14 +281,23 @@ __all__ = [
     "validate_length",
     "validate_pattern",
     "validate_range",
+    "validate_uniqueness",
+    "validate_referential_integrity",
+    "validate_enum_values",
+    "check_data_quality",
+    "validate_completeness",
 
-    # SCD transformers
+    # SCD transformers (8)
     "apply_scd_type1",
     "apply_scd_type2",
     "apply_scd_type3",
     "close_scd_records",
+    "detect_scd_changes",
+    "merge_scd_type2",
+    "get_scd_current_records",
+    "get_scd_as_of_date",
 
-    # Aggregation transformers
+    # Aggregation transformers (10)
     "aggregate_by_key",
     "pivot_table",
     "add_running_total",
@@ -214,20 +307,71 @@ __all__ = [
     "add_ntile",
     "rollup_aggregation",
     "cube_aggregation",
+    "add_cumulative_distribution",
 
-    # Parsing transformers
+    # Parsing transformers (14)
     "parse_json_column",
     "extract_json_field",
     "explode_array_column",
     "split_delimited_column",
     "flatten_struct_column",
+    "parse_xml_column",
+    "extract_map_keys_values",
+    "explode_map_column",
+    "parse_url_parameters",
+    "flatten_nested_arrays",
+    "parse_csv_column",
+    "extract_regex_groups",
+    "json_to_struct_array",
+    "struct_to_json",
 
-    # PII transformers
+    # PII transformers (5)
     "mask_column",
     "tokenize_column",
     "redact_email",
     "anonymize_with_lookup",
     "remove_pii_columns",
+
+    # DateTime transformers (12)
+    "parse_date_string",
+    "parse_timestamp_string",
+    "convert_unix_timestamp",
+    "format_datetime",
+    "extract_date_parts",
+    "add_days_to_date",
+    "add_months_to_date",
+    "calculate_date_diff",
+    "get_next_day_of_week",
+    "get_last_day_of_month",
+    "truncate_to_period",
+    "add_age_category",
+
+    # CDC transformers (9)
+    "detect_changes",
+    "apply_cdc_merge",
+    "add_cdc_metadata",
+    "apply_soft_delete",
+    "merge_incremental_updates",
+    "capture_before_after",
+    "apply_delta_updates",
+    "track_row_versions",
+    "identify_latest_records",
+
+    # Advanced transformers (14)
+    "sample_data",
+    "unpivot_columns",
+    "create_sessionization",
+    "apply_conditional_logic",
+    "create_composite_key",
+    "broadcast_join_small_table",
+    "calculate_running_statistics",
+    "create_bins",
+    "create_array_column",
+    "create_map_column",
+    "rank_within_groups",
+    "calculate_percentiles",
+    "apply_lookup_with_fallback",
+    "calculate_percent_change",
 ]
 
 
@@ -248,13 +392,16 @@ def list_all_transformers():
         >>> print(transformers["cleaning"])
     """
     return {
-        "cleaning": [name for name in dir(cleaning) if not name.startswith("_")],
-        "enrichment": [name for name in dir(enrichment) if not name.startswith("_")],
-        "validation": [name for name in dir(validation) if not name.startswith("_")],
-        "scd": [name for name in dir(scd) if not name.startswith("_")],
-        "aggregation": [name for name in dir(aggregation) if not name.startswith("_")],
-        "parsing": [name for name in dir(parsing) if not name.startswith("_")],
-        "pii": [name for name in dir(pii) if not name.startswith("_")]
+        "cleaning": [name for name in dir(cleaning) if not name.startswith("_") and callable(getattr(cleaning, name))],
+        "enrichment": [name for name in dir(enrichment) if not name.startswith("_") and callable(getattr(enrichment, name))],
+        "validation": [name for name in dir(validation) if not name.startswith("_") and callable(getattr(validation, name))],
+        "scd": [name for name in dir(scd) if not name.startswith("_") and callable(getattr(scd, name))],
+        "aggregation": [name for name in dir(aggregation) if not name.startswith("_") and callable(getattr(aggregation, name))],
+        "parsing": [name for name in dir(parsing) if not name.startswith("_") and callable(getattr(parsing, name))],
+        "pii": [name for name in dir(pii) if not name.startswith("_") and callable(getattr(pii, name))],
+        "datetime": [name for name in dir(datetime) if not name.startswith("_") and callable(getattr(datetime, name))],
+        "cdc": [name for name in dir(cdc) if not name.startswith("_") and callable(getattr(cdc, name))],
+        "advanced": [name for name in dir(advanced) if not name.startswith("_") and callable(getattr(advanced, name))]
     }
 
 

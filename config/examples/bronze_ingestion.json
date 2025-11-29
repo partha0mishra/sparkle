@@ -1,0 +1,20 @@
+{
+    "pipeline_name": "customer_bronze_ingestion",
+    "pipeline_type": "BronzeRawIngestionPipeline",
+    "env": "prod",
+    "source_system": "salesforce",
+    "source_connection": "salesforce_prod",
+    "destination_catalog": "sparkle_prod",
+    "destination_schema": "bronze_salesforce",
+    "destination_table": "customers",
+    "ingestor": "salesforce_ingestor",
+    "partition_columns": [
+        "_ingested_date"
+    ],
+    "extra_config": {
+        "ingestor_config": {
+            "object": "Account",
+            "soql": "SELECT Id, Name, CreatedDate FROM Account"
+        }
+    }
+}

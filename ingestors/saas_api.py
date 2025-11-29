@@ -14,8 +14,11 @@ from .factory import register_ingestor
 class SalesforceBulkApiFullExtractor(BaseBatchIngestor):
     """
     Salesforce full export via Bulk API 2.0.
-    
-    Config: {"source_name": "sf_accounts", "connection_name": "salesforce", 
+
+    Sub-Group: SaaS API
+    Tags: salesforce, bulk-api, full-export, crm
+
+    Config: {"source_name": "sf_accounts", "connection_name": "salesforce",
              "sobject": "Account", "target_table": "accounts_full"}
     """
     
@@ -36,9 +39,12 @@ class SalesforceBulkApiFullExtractor(BaseBatchIngestor):
 class SalesforceBulkApiIncrementalExtractor(BaseBatchIngestor):
     """
     Salesforce incremental via PK Chunking + LastModifiedDate.
-    
+
+    Sub-Group: SaaS API
+    Tags: salesforce, bulk-api, incremental, pk-chunking, crm
+
     Config: {"source_name": "sf_contacts", "connection_name": "salesforce",
-             "sobject": "Contact", "target_table": "contacts", 
+             "sobject": "Contact", "target_table": "contacts",
              "watermark_column": "LastModifiedDate"}
     """
     
@@ -61,9 +67,12 @@ class SalesforceBulkApiIncrementalExtractor(BaseBatchIngestor):
 class SalesforceCDCStreamer(BaseStreamingIngestor):
     """
     Salesforce CDC via CometD/Replay.
-    
+
+    Sub-Group: SaaS API
+    Tags: salesforce, cdc, streaming, cometd, change-event, crm
+
     Config: {"source_name": "sf_cdc", "connection_name": "salesforce_cdc",
-             "channel": "/data/AccountChangeEvent", 
+             "channel": "/data/AccountChangeEvent",
              "target_table": "account_changes"}
     """
     
@@ -81,7 +90,10 @@ class SalesforceCDCStreamer(BaseStreamingIngestor):
 class NetsuiteSuiteAnalyticsIncremental(BaseBatchIngestor):
     """
     Netsuite via SuiteAnalytics + LAST_MODIFIED_DATE.
-    
+
+    Sub-Group: SaaS API
+    Tags: netsuite, suiteanalytics, incremental, erp
+
     Config: {"source_name": "ns_customers", "connection_name": "netsuite",
              "saved_search_id": "123", "target_table": "customers",
              "watermark_column": "lastmodifieddate"}
@@ -106,7 +118,10 @@ class NetsuiteSuiteAnalyticsIncremental(BaseBatchIngestor):
 class WorkdayPrismRaaSIncremental(BaseBatchIngestor):
     """
     Workday Prism via RaaS API.
-    
+
+    Sub-Group: SaaS API
+    Tags: workday, prism, raas, incremental, hrms
+
     Config: {"source_name": "wd_employees", "connection_name": "workday_prism",
              "report_url": "https://...", "target_table": "employees"}
     """
@@ -129,7 +144,10 @@ class WorkdayPrismRaaSIncremental(BaseBatchIngestor):
 class MarketoBulkExtractIncremental(BaseBatchIngestor):
     """
     Marketo Bulk Export with sinceDateTime.
-    
+
+    Sub-Group: SaaS API
+    Tags: marketo, bulk-export, incremental, marketing-automation
+
     Config: {"source_name": "marketo_leads", "connection_name": "marketo",
              "export_type": "leads", "target_table": "leads"}
     """
@@ -154,7 +172,10 @@ class MarketoBulkExtractIncremental(BaseBatchIngestor):
 class HubSpotIncrementalIngestion(BaseBatchIngestor):
     """
     HubSpot incremental via cursor pagination.
-    
+
+    Sub-Group: SaaS API
+    Tags: hubspot, incremental, cursor-pagination, crm, marketing
+
     Config: {"source_name": "hubspot_contacts", "connection_name": "hubspot",
              "object_type": "contacts", "target_table": "contacts"}
     """
@@ -179,7 +200,10 @@ class HubSpotIncrementalIngestion(BaseBatchIngestor):
 class ZendeskIncrementalIngestion(BaseBatchIngestor):
     """
     Zendesk incremental with start_time cursor.
-    
+
+    Sub-Group: SaaS API
+    Tags: zendesk, incremental, cursor, customer-support
+
     Config: {"source_name": "zendesk_tickets", "connection_name": "zendesk",
              "endpoint": "tickets", "target_table": "tickets"}
     """
@@ -204,7 +228,10 @@ class ZendeskIncrementalIngestion(BaseBatchIngestor):
 class ShopifyAdminApiIncremental(BaseBatchIngestor):
     """
     Shopify incremental via since_id + created_at_min.
-    
+
+    Sub-Group: SaaS API
+    Tags: shopify, admin-api, incremental, ecommerce
+
     Config: {"source_name": "shopify_orders", "connection_name": "shopify",
              "resource": "orders", "target_table": "orders"}
     """
@@ -230,7 +257,10 @@ class ShopifyAdminApiIncremental(BaseBatchIngestor):
 class StripeIncrementalEventsIngestion(BaseBatchIngestor):
     """
     Stripe Events API with starting_after + created filter.
-    
+
+    Sub-Group: SaaS API
+    Tags: stripe, events-api, incremental, payments
+
     Config: {"source_name": "stripe_charges", "connection_name": "stripe",
              "object_type": "charges", "target_table": "charges"}
     """
@@ -257,7 +287,10 @@ class StripeIncrementalEventsIngestion(BaseBatchIngestor):
 class ZuoraAquaIncremental(BaseBatchIngestor):
     """
     Zuora AQUA API with updatedDate watermark.
-    
+
+    Sub-Group: SaaS API
+    Tags: zuora, aqua-api, incremental, billing, subscription
+
     Config: {"source_name": "zuora_accounts", "connection_name": "zuora",
              "object_type": "Account", "target_table": "accounts"}
     """
@@ -282,7 +315,10 @@ class ZuoraAquaIncremental(BaseBatchIngestor):
 class ServiceNowTableApiIncremental(BaseBatchIngestor):
     """
     ServiceNow with sys_updated_on watermark.
-    
+
+    Sub-Group: SaaS API
+    Tags: servicenow, table-api, incremental, itsm
+
     Config: {"source_name": "snow_incidents", "connection_name": "servicenow",
              "table": "incident", "target_table": "incidents"}
     """
@@ -307,7 +343,10 @@ class ServiceNowTableApiIncremental(BaseBatchIngestor):
 class GoogleAnalytics4BigQueryExportDaily(BaseBatchIngestor):
     """
     GA4 BigQuery export daily tables.
-    
+
+    Sub-Group: SaaS API
+    Tags: google-analytics, ga4, bigquery-export, daily, analytics
+
     Config: {"source_name": "ga4_events", "connection_name": "bigquery",
              "dataset": "analytics_123456789", "table_prefix": "events_",
              "target_table": "ga4_events"}
@@ -340,7 +379,10 @@ class GoogleAnalytics4BigQueryExportDaily(BaseBatchIngestor):
 class GoogleAdsReportIncremental(BaseBatchIngestor):
     """
     Google Ads report with date range from watermark.
-    
+
+    Sub-Group: SaaS API
+    Tags: google-ads, incremental, advertising, marketing
+
     Config: {"source_name": "gads_campaigns", "connection_name": "google_ads",
              "query": "SELECT ...", "target_table": "campaigns"}
     """
@@ -365,7 +407,10 @@ class GoogleAdsReportIncremental(BaseBatchIngestor):
 class MetaAdsInsightsIncremental(BaseBatchIngestor):
     """
     Meta/Facebook Ads Insights with time_increment.
-    
+
+    Sub-Group: SaaS API
+    Tags: meta-ads, facebook-ads, insights, incremental, advertising
+
     Config: {"source_name": "fb_insights", "connection_name": "facebook_ads",
              "object_type": "insights", "target_table": "insights"}
     """
@@ -397,7 +442,10 @@ class MetaAdsInsightsIncremental(BaseBatchIngestor):
 class LinkedInAdsIncremental(BaseBatchIngestor):
     """
     LinkedIn Ads with start_date watermark.
-    
+
+    Sub-Group: SaaS API
+    Tags: linkedin-ads, incremental, advertising, marketing
+
     Config: {"source_name": "li_campaigns", "connection_name": "linkedin_ads",
              "object_type": "analytics", "target_table": "analytics"}
     """
@@ -425,7 +473,10 @@ class LinkedInAdsIncremental(BaseBatchIngestor):
 class AmplitudeEventExportIncremental(BaseBatchIngestor):
     """
     Amplitude daily event export files from S3.
-    
+
+    Sub-Group: SaaS API
+    Tags: amplitude, event-export, incremental, analytics, s3
+
     Config: {"source_name": "amplitude_events", "connection_name": "amplitude",
              "target_table": "amplitude_events"}
     """
@@ -452,7 +503,10 @@ class AmplitudeEventExportIncremental(BaseBatchIngestor):
 class SegmentWarehouseSync(BaseBatchIngestor):
     """
     Segment S3 exports (pages, tracks, identifies).
-    
+
+    Sub-Group: SaaS API
+    Tags: segment, warehouse-sync, s3, customer-data-platform, analytics
+
     Config: {"source_name": "segment_tracks", "connection_name": "segment",
              "source": "s3", "target_table": "segment_tracks"}
     """

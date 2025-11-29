@@ -192,3 +192,22 @@ class Ingestor:
             >>> Ingestor.register("my_ingestor", MyIngestorClass)
         """
         IngestorFactory.register(name, ingestor_class)
+
+
+# Convenience function
+def get_ingestor(
+    name: str,
+    spark: Optional[SparkSession] = None,
+    env: str = "prod",
+    config: Optional[Dict[str, Any]] = None
+) -> BaseIngestor:
+    """
+    Convenience function to create an ingestor.
+    """
+    if spark is None:
+        try:
+            spark = SparkSession.builder.getOrCreate()
+        except Exception:
+            pass
+            
+    return IngestorFactory.create(name, spark, env=env, config=config)

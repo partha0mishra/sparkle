@@ -15,7 +15,6 @@ from .factory import register_connection
 
 
 @register_connection("rest")
-@register_connection("rest_api")
 class RESTAPIConnection(APIConnection):
     """
     Generic REST API connection.

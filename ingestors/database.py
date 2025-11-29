@@ -15,7 +15,10 @@ from .factory import register_ingestor
 class JdbcIncrementalByDateColumn(BaseBatchIngestor):
     """
     Generic JDBC incremental using date column watermark.
-    
+
+    Sub-Group: Database
+    Tags: jdbc, incremental, date-watermark, database
+
     Config example:
         {
             "source_name": "postgres_orders",
@@ -62,7 +65,10 @@ class JdbcIncrementalByDateColumn(BaseBatchIngestor):
 class JdbcIncrementalByIdRange(BaseBatchIngestor):
     """
     Incremental using monotonically increasing PK with dynamic ranges.
-    
+
+    Sub-Group: Database
+    Tags: jdbc, incremental, id-range, primary-key, database
+
     Config example:
         {
             "source_name": "mysql_users",
@@ -103,7 +109,10 @@ class JdbcIncrementalByIdRange(BaseBatchIngestor):
 class JdbcFullTableWithHashPartitioning(BaseBatchIngestor):
     """
     Full table with parallel JDBC reads via hash partitioning.
-    
+
+    Sub-Group: Database
+    Tags: jdbc, full-table, hash-partitioning, parallel-read, database
+
     Config example:
         {
             "source_name": "oracle_customers",
@@ -139,7 +148,10 @@ class JdbcFullTableWithHashPartitioning(BaseBatchIngestor):
 class OracleFlashbackQueryIngestion(BaseBatchIngestor):
     """
     Oracle Flashback Query AS OF SCN/timestamp.
-    
+
+    Sub-Group: Database
+    Tags: oracle, flashback, scn, timestamp, point-in-time
+
     Config example:
         {
             "source_name": "oracle_transactions",
@@ -177,7 +189,10 @@ class OracleFlashbackQueryIngestion(BaseBatchIngestor):
 class Db2CdcViaInfoSphere(BaseBatchIngestor):
     """
     IBM InfoSphere CDC -> Kafka -> Delta.
-    
+
+    Sub-Group: Database
+    Tags: db2, infosphere, cdc, kafka, ibm
+
     Config example:
         {
             "source_name": "db2_cdc",
@@ -209,7 +224,10 @@ class Db2CdcViaInfoSphere(BaseBatchIngestor):
 class TeradataFastExportParallel(BaseBatchIngestor):
     """
     Teradata FastExport parallel dump files.
-    
+
+    Sub-Group: Database
+    Tags: teradata, fastexport, parallel, dump-files
+
     Config example:
         {
             "source_name": "teradata_sales",
@@ -231,7 +249,10 @@ class TeradataFastExportParallel(BaseBatchIngestor):
 class SapOdpExtractor(BaseBatchIngestor):
     """
     SAP ODP/ODQ extraction.
-    
+
+    Sub-Group: Database
+    Tags: sap, odp, odq, extraction, erp
+
     Config example:
         {
             "source_name": "sap_customers",

@@ -7,6 +7,7 @@ import ReactFlow, {
   Controls,
   MiniMap,
   addEdge,
+  MarkerType,
   type Connection,
   type Edge,
 } from 'reactflow';
@@ -26,8 +27,13 @@ export function Canvas() {
         ...connection,
         type: 'smoothstep',
         animated: true,
-        markerEnd: 'arrowclosed',
-        style: { stroke: '#6b7280' },
+        markerEnd: {
+          type: MarkerType.ArrowClosed,
+          width: 20,
+          height: 20,
+          color: '#6b7280',
+        },
+        style: { stroke: '#6b7280', strokeWidth: 2 },
       };
       addEdgeToStore(newEdge);
     },
@@ -70,7 +76,9 @@ export function Canvas() {
               sink: '#ef4444',
               connection: '#3b82f6',
             };
-            return colors[node.data.component_type] || '#6b7280';
+            // Use visual_category if available (for task nodes), otherwise component_type
+            const category = node.data.visual_category || node.data.component_type;
+            return colors[category] || '#6b7280';
           }}
         />
       </ReactFlow>

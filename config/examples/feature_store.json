@@ -1,0 +1,18 @@
+{
+    "pipeline_name": "customer_features",
+    "pipeline_type": "FeatureStoreDailyMaterializationPipeline",
+    "env": "prod",
+    "source_table": "sparkle_prod.silver_sales.customers",
+    "destination_catalog": "sparkle_prod",
+    "destination_schema": "feature_store",
+    "destination_table": "customer_features",
+    "primary_key": [
+        "customer_id"
+    ],
+    "transformers": [
+        {
+            "name": "calculate_lifetime_value",
+            "params": {}
+        }
+    ]
+}

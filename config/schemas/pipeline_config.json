@@ -1,0 +1,140 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Sparkle Pipeline Configuration",
+    "type": "object",
+    "required": [
+        "pipeline_name",
+        "pipeline_type",
+        "env"
+    ],
+    "properties": {
+        "pipeline_name": {
+            "type": "string"
+        },
+        "pipeline_type": {
+            "type": "string"
+        },
+        "env": {
+            "type": "string",
+            "enum": [
+                "dev",
+                "qa",
+                "prod"
+            ]
+        },
+        "source_system": {
+            "type": "string"
+        },
+        "source_connection": {
+            "type": "string"
+        },
+        "source_table": {
+            "type": "string"
+        },
+        "source_tables": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "destination_catalog": {
+            "type": "string"
+        },
+        "destination_schema": {
+            "type": "string"
+        },
+        "destination_table": {
+            "type": "string"
+        },
+        "primary_key": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "business_key": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "partition_columns": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "watermark_column": {
+            "type": "string"
+        },
+        "transformers": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                    "name"
+                ],
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    },
+                    "params": {
+                        "type": "object"
+                    }
+                }
+            }
+        },
+        "ingestor": {
+            "type": "string"
+        },
+        "write_mode": {
+            "type": "string",
+            "enum": [
+                "append",
+                "overwrite",
+                "merge",
+                "complete",
+                "update"
+            ]
+        },
+        "checkpoint_location": {
+            "type": "string"
+        },
+        "model_name": {
+            "type": "string"
+        },
+        "feature_columns": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "target_column": {
+            "type": "string"
+        },
+        "expectations_suite": {
+            "type": "string"
+        },
+        "schedule": {
+            "type": "string"
+        },
+        "dependencies": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "tags": {
+            "type": "object"
+        },
+        "alert_channels": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "extra_config": {
+            "type": "object"
+        }
+    }
+}

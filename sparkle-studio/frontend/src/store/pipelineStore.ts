@@ -12,6 +12,7 @@ import {
   addEdge as reactFlowAddEdge,
 } from 'reactflow';
 import type { Pipeline, PipelineMetadata, PipelineConfig } from '@/types/pipeline';
+import type { ComponentMetadata } from '@/types/component';
 
 interface PipelineState {
   // Current pipeline
@@ -22,8 +23,11 @@ interface PipelineState {
   nodes: Node[];
   edges: Edge[];
 
-  // Selected node for properties panel
+  // Selected node for properties panel (from canvas)
   selectedNode: Node | null;
+
+  // Selected component for properties panel (from sidebar)
+  selectedComponent: ComponentMetadata | null;
 
   // Undo/Redo
   history: { nodes: Node[]; edges: Edge[] }[];
@@ -38,9 +42,11 @@ interface PipelineState {
   setNodes: (nodes: Node[]) => void;
   setEdges: (edges: Edge[]) => void;
   addEdge: (connection: Connection | Edge) => void;
+  addEdges: (edges: Edge[]) => void;
   onNodesChange: OnNodesChange;
   onEdgesChange: OnEdgesChange;
   setSelectedNode: (node: Node | null) => void;
+  setSelectedComponent: (component: ComponentMetadata | null) => void;
   addNode: (node: Node) => void;
   updateNode: (id: string, data: Partial<Node['data']>) => void;
   deleteNode: (id: string) => void;
@@ -60,6 +66,7 @@ export const usePipelineStore = create<PipelineState>((set, get) => ({
   nodes: [],
   edges: [],
   selectedNode: null,
+  selectedComponent: null,
   history: [],
   historyIndex: -1,
   isLoading: false,
@@ -90,6 +97,12 @@ export const usePipelineStore = create<PipelineState>((set, get) => ({
     get().saveToHistory();
   },
 
+  addEdges: (newEdges) => {
+    const { edges } = get();
+    set({ edges: [...edges, ...newEdges] });
+    get().saveToHistory();
+  },
+
   onNodesChange: (changes: NodeChange[]) => {
     set({
       nodes: applyNodeChanges(changes, get().nodes),
@@ -103,7 +116,13 @@ export const usePipelineStore = create<PipelineState>((set, get) => ({
   },
 
   setSelectedNode: (node) => {
-    set({ selectedNode: node });
+    // When selecting a node, clear selected component
+    set({ selectedNode: node, selectedComponent: null });
+  },
+
+  setSelectedComponent: (component) => {
+    // When selecting a component, clear selected node
+    set({ selectedComponent: component, selectedNode: null });
   },
 
   addNode: (node) => {
@@ -196,6 +215,7 @@ export const usePipelineStore = create<PipelineState>((set, get) => ({
       nodes: [],
       edges: [],
       selectedNode: null,
+      selectedComponent: null,
       history: [],
       historyIndex: -1,
       isLoading: false,

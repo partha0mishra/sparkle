@@ -32,6 +32,9 @@ class HyperparameterSweep(BaseModelTrainer):
     """
     Grid search or random search for hyperparameter tuning.
 
+    Sub-Group: Model Training Patterns
+    Tags: training, ml, modeling, mlflow
+
     Config example:
         {
             "train_table": "gold.train_data",
@@ -144,6 +147,9 @@ class CrossValidator(BaseModelTrainer):
     """
     K-fold cross-validation with stratification support.
 
+    Sub-Group: Model Training Patterns
+    Tags: training, ml, modeling, mlflow
+
     Config example:
         {
             "train_table": "gold.train_data",
@@ -212,6 +218,9 @@ class TimeSeriesSplit(BaseModelTrainer):
     """
     Time-series aware train/test splitting with expanding window.
 
+    Sub-Group: Model Training Patterns
+    Tags: training, ml, modeling, mlflow
+
     Config example:
         {
             "input_table": "gold.timeseries_data",
@@ -275,6 +284,9 @@ class StratifiedSampler(BaseModelTrainer):
     """
     Create stratified train/test splits maintaining class distribution.
 
+    Sub-Group: Model Training Patterns
+    Tags: training, ml, modeling, mlflow
+
     Config example:
         {
             "input_table": "gold.classification_data",
@@ -316,6 +328,9 @@ class StratifiedSampler(BaseModelTrainer):
 class SMOTEOversampler(BaseModelTrainer):
     """
     SMOTE (Synthetic Minority Over-sampling Technique) for imbalanced data.
+
+    Sub-Group: Model Training Patterns
+    Tags: training, ml, modeling, mlflow
 
     Config example:
         {
@@ -365,6 +380,9 @@ class SMOTEOversampler(BaseModelTrainer):
 class AdversarialValidation(BaseModelTrainer):
     """
     Detect train/test distribution shift using adversarial validation.
+
+    Sub-Group: Model Training Patterns
+    Tags: training, ml, modeling, mlflow
 
     Config example:
         {
@@ -416,6 +434,9 @@ class AdversarialValidation(BaseModelTrainer):
 class ModelEnsemble(BaseModelTrainer):
     """
     Ensemble multiple models using averaging, voting, or stacking.
+
+    Sub-Group: Model Training Patterns
+    Tags: training, ml, modeling, mlflow
 
     Config example:
         {
@@ -478,6 +499,9 @@ class AutoMLTrainer(BaseModelTrainer):
     """
     Automated ML with Databricks AutoML or H2O AutoML.
 
+    Sub-Group: Model Training Patterns
+    Tags: training, ml, modeling, mlflow
+
     Config example:
         {
             "train_table": "gold.train_data",
@@ -532,6 +556,9 @@ class ProphetForecaster(BaseModelTrainer):
     """
     Facebook Prophet time-series forecasting.
 
+    Sub-Group: Model Training Patterns
+    Tags: training, ml, modeling, mlflow
+
     Config example:
         {
             "train_table": "gold.timeseries_train",
@@ -578,6 +605,9 @@ class ARIMAXTrainer(BaseModelTrainer):
     """
     ARIMAX (ARIMA with exogenous variables) trainer.
 
+    Sub-Group: Model Training Patterns
+    Tags: training, ml, modeling, mlflow
+
     Config example:
         {
             "train_table": "gold.timeseries_train",
@@ -619,6 +649,9 @@ class ARIMAXTrainer(BaseModelTrainer):
 class LSTMSequenceTrainer(BaseModelTrainer):
     """
     LSTM for sequence prediction using TensorFlow/PyTorch.
+
+    Sub-Group: Model Training Patterns
+    Tags: training, ml, modeling, mlflow
 
     Config example:
         {
@@ -673,6 +706,9 @@ class LSTMSequenceTrainer(BaseModelTrainer):
 class XGBoostSparkTrainer(BaseModelTrainer):
     """
     Distributed XGBoost training on Spark.
+
+    Sub-Group: Model Training Patterns
+    Tags: training, ml, modeling, mlflow
 
     Config example:
         {
@@ -731,6 +767,9 @@ class LightGBMSparkTrainer(BaseModelTrainer):
     """
     Distributed LightGBM training on Spark.
 
+    Sub-Group: Model Training Patterns
+    Tags: training, ml, modeling, mlflow
+
     Config example:
         {
             "train_table": "gold.train_data",
@@ -780,6 +819,9 @@ class LightGBMSparkTrainer(BaseModelTrainer):
 class CatBoostSparkTrainer(BaseModelTrainer):
     """
     CatBoost training with native categorical feature support.
+
+    Sub-Group: Model Training Patterns
+    Tags: training, ml, modeling, mlflow
 
     Config example:
         {
@@ -841,6 +883,9 @@ class H2OAutoMLTrainer(BaseModelTrainer):
     """
     H2O AutoML for automated model selection and tuning.
 
+    Sub-Group: Model Training Patterns
+    Tags: training, ml, modeling, mlflow
+
     Config example:
         {
             "train_table": "gold.train_data",
@@ -883,6 +928,9 @@ class MLflowModelWrapper(BaseModelTrainer):
     """
     Wrap custom PyFunc models for MLflow.
 
+    Sub-Group: Model Training Patterns
+    Tags: training, ml, modeling, mlflow
+
     Config example:
         {
             "model_class": "custom.MyModel",
@@ -919,6 +967,9 @@ class MLflowModelWrapper(BaseModelTrainer):
 class ChampionChallengerTrainer(BaseModelTrainer):
     """
     A/B test champion vs challenger models.
+
+    Sub-Group: Model Training Patterns
+    Tags: training, ml, modeling, mlflow
 
     Config example:
         {
@@ -970,6 +1021,9 @@ class ChampionChallengerTrainer(BaseModelTrainer):
 class ModelExplainabilityTrainer(BaseModelTrainer):
     """
     Train model with built-in explainability (SHAP, LIME).
+
+    Sub-Group: Model Training Patterns
+    Tags: training, ml, modeling, mlflow
 
     Config example:
         {

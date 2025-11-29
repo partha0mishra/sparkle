@@ -23,7 +23,19 @@ class IBMiConnection(JDBCConnection):
 
     Connects to IBM i DB2 databases using the open-source JT400 driver.
 
-    Example config:
+    Example config (config/connections/ibm_i/prod.json):
+        {
+            "host": "as400.example.com",
+            "port": 8471,
+            "database": "PRODLIB",
+            "username": "${IBMI_USERNAME}",
+            "password": "${IBMI_PASSWORD}",
+            "driver": "com.ibm.as400.access.AS400JDBCDriver",
+            "naming": "system",
+            "libraries": "PRODLIB,TESTLIB"
+        }
+
+    Example config (YAML):
         ibm_i_prod:
           type: ibm_i
           host: as400.example.com
@@ -109,7 +121,16 @@ class MainframeEBCDICConnection(SparkleConnection):
     Reads mainframe files (EBCDIC-encoded) using copybook layout definitions.
     Common use case: Migrating mainframe data to cloud data lakes.
 
-    Example config:
+    Example config (config/connections/mainframe_ebcdic/prod.json):
+        {
+            "s3_data_path": "s3://mainframe-exports/customer-master/",
+            "copybook_path": "s3://mainframe-schemas/customer-copybook.cpy",
+            "file_format": "fixed_width",
+            "encoding": "cp037",
+            "record_length": 500
+        }
+
+    Example config (YAML):
         mainframe_prod:
           type: mainframe_ebcdic
           s3_data_path: s3://mainframe-exports/customer-master/
@@ -249,7 +270,19 @@ class SAPODPConnection(SparkleConnection):
     Extracts data from SAP using ODP framework (replacement for legacy extractors).
     Supports both full and delta loads with change data capture.
 
-    Example config:
+    Example config (config/connections/sap_odp/prod.json):
+        {
+            "host": "sap.example.com",
+            "system_number": "00",
+            "client": "100",
+            "username": "${SAP_USERNAME}",
+            "password": "${SAP_PASSWORD}",
+            "language": "EN",
+            "odp_context": "SAPI",
+            "subscriber_name": "SPARKLE_PROD"
+        }
+
+    Example config (YAML):
         sap_prod:
           type: sap_odp
           host: sap.example.com
@@ -392,7 +425,18 @@ class SAPDatasphereConnection(JDBCConnection):
 
     Connects to SAP's cloud data warehouse via JDBC/ODBC.
 
-    Example config:
+    Example config (config/connections/sap_datasphere/prod.json):
+        {
+            "host": "mytenant.eu10.hcs.cloud.sap",
+            "port": 443,
+            "database": "DWCDB",
+            "username": "${SAP_DWC_USERNAME}",
+            "password": "${SAP_DWC_PASSWORD}",
+            "schema": "MYSPACE",
+            "ssl": true
+        }
+
+    Example config (YAML):
         sap_datasphere_prod:
           type: sap_datasphere
           host: mytenant.eu10.hcs.cloud.sap
@@ -443,7 +487,19 @@ class OracleEBSConnection(JDBCConnection):
     Connects to Oracle EBS database with special handling for
     multi-org, virtual private database (VPD), and EBS-specific tables.
 
-    Example config:
+    Example config (config/connections/oracle_ebs/prod.json):
+        {
+            "host": "ebs.example.com",
+            "port": 1521,
+            "service_name": "EBSPROD",
+            "username": "${ORACLE_EBS_USERNAME}",
+            "password": "${ORACLE_EBS_PASSWORD}",
+            "responsibility_id": 50559,
+            "org_id": 101,
+            "apps_schema": "APPS"
+        }
+
+    Example config (YAML):
         oracle_ebs_prod:
           type: oracle_ebs
           host: ebs.example.com
@@ -527,7 +583,18 @@ class PeopleSoftConnection(JDBCConnection):
 
     Connects to PeopleSoft databases (can be Oracle or SQL Server backend).
 
-    Example config:
+    Example config (config/connections/peoplesoft/prod.json):
+        {
+            "backend": "oracle",
+            "host": "psft.example.com",
+            "port": 1521,
+            "service_name": "HRPROD",
+            "username": "${PSFT_USERNAME}",
+            "password": "${PSFT_PASSWORD}",
+            "database_name": "HRPROD"
+        }
+
+    Example config (YAML):
         peoplesoft_prod:
           type: peoplesoft
           backend: oracle  # or 'sqlserver'

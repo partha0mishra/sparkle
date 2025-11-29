@@ -15,7 +15,10 @@ from .factory import register_ingestor
 class KafkaTopicRawIngestion(BaseStreamingIngestor):
     """
     Raw Kafka topic ingestion with exactly-once semantics.
-    
+
+    Sub-Group: Streaming & Event Bus
+    Tags: kafka, streaming, exactly-once, event-bus
+
     Config example:
         {
             "source_name": "events_kafka",
@@ -65,7 +68,10 @@ class KafkaTopicRawIngestion(BaseStreamingIngestor):
 class KinesisDataStreamsIngestion(BaseStreamingIngestor):
     """
     AWS Kinesis Data Streams ingestion.
-    
+
+    Sub-Group: Streaming & Event Bus
+    Tags: kinesis, aws, streaming, event-bus
+
     Config example:
         {
             "source_name": "kinesis_events",
@@ -93,7 +99,10 @@ class KinesisDataStreamsIngestion(BaseStreamingIngestor):
 class EventHubsKafkaProtocolIngestion(BaseStreamingIngestor):
     """
     Azure Event Hubs (Kafka mode) ingestion.
-    
+
+    Sub-Group: Streaming & Event Bus
+    Tags: eventhubs, azure, kafka-protocol, streaming
+
     Config example:
         {
             "source_name": "eventhubs_events",
@@ -121,7 +130,10 @@ class EventHubsKafkaProtocolIngestion(BaseStreamingIngestor):
 class PubSubTopicIngestion(BaseStreamingIngestor):
     """
     Google Pub/Sub topic ingestion.
-    
+
+    Sub-Group: Streaming & Event Bus
+    Tags: pubsub, gcp, streaming, messaging
+
     Config example:
         {
             "source_name": "pubsub_events",
@@ -149,7 +161,10 @@ class PubSubTopicIngestion(BaseStreamingIngestor):
 class PulsarTopicIngestion(BaseStreamingIngestor):
     """
     Apache Pulsar topic ingestion.
-    
+
+    Sub-Group: Streaming & Event Bus
+    Tags: pulsar, apache-pulsar, streaming, messaging
+
     Config example:
         {
             "source_name": "pulsar_events",
@@ -177,7 +192,10 @@ class PulsarTopicIngestion(BaseStreamingIngestor):
 class ConfluentSchemaRegistryAvroIngestion(BaseStreamingIngestor):
     """
     Kafka with Confluent Schema Registry Avro deserialization.
-    
+
+    Sub-Group: Streaming & Event Bus
+    Tags: kafka, confluent, schema-registry, avro, streaming
+
     Config example:
         {
             "source_name": "avro_events",
@@ -220,7 +238,10 @@ class ConfluentSchemaRegistryAvroIngestion(BaseStreamingIngestor):
 class RedpandaTopicIngestion(BaseStreamingIngestor):
     """
     Redpanda topic ingestion (Kafka-compatible).
-    
+
+    Sub-Group: Streaming & Event Bus
+    Tags: redpanda, kafka-compatible, streaming, event-bus
+
     Config example:
         {
             "source_name": "redpanda_events",
@@ -248,7 +269,10 @@ class RedpandaTopicIngestion(BaseStreamingIngestor):
 class StructuredStreamingCheckpointedIngestion(BaseStreamingIngestor):
     """
     Generic wrapper for any streaming source.
-    
+
+    Sub-Group: Streaming & Event Bus
+    Tags: structured-streaming, generic, checkpointed, streaming
+
     Config example:
         {
             "source_name": "custom_stream",

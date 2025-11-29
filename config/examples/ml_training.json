@@ -1,0 +1,24 @@
+{
+    "pipeline_name": "churn_prediction_training",
+    "pipeline_type": "MLTrainingChampionChallengerPipeline",
+    "env": "prod",
+    "model_name": "churn_predictor",
+    "extra_config": {
+        "models": [
+            {
+                "trainer": "xgboost",
+                "config": {
+                    "max_depth": 5
+                }
+            },
+            {
+                "trainer": "random_forest",
+                "config": {
+                    "n_estimators": 100
+                }
+            }
+        ],
+        "metric": "auc",
+        "threshold": 0.85
+    }
+}

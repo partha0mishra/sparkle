@@ -10,15 +10,16 @@ import { TopBar } from './components/TopBar';
 import { usePipelineStore } from './store/pipelineStore';
 import { usePipeline } from './hooks/usePipeline';
 import { generateId } from './lib/utils';
+import { expandPipeline, isPipelineComponent } from './services/pipelineExpander';
 
 function App() {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
-  const { addNode } = usePipelineStore();
-  const { setNodes } = usePipeline();
+  const { addNode, addEdges } = usePipelineStore();
+  const { nodes: currentNodes } = usePipeline();
 
   // Handle drop for drag & drop from sidebar
   const onDrop = useCallback(
-    (event: React.DragEvent) => {
+    async (event: React.DragEvent) => {
       event.preventDefault();
 
       const reactFlowBounds = reactFlowWrapper.current?.getBoundingClientRect();
@@ -35,6 +36,32 @@ function App() {
         y: event.clientY - reactFlowBounds.top - 20,
       };
 
+      // Check if this is an orchestrator pipeline component that should be expanded
+      if (isPipelineComponent(nodeData.component_type, nodeData.component_name)) {
+        // Expand pipeline into DAG
+        const expanded = await expandPipeline(
+          nodeData.component_type,
+          nodeData.component_name,
+          position
+        );
+
+        if (expanded) {
+          // Add all nodes from the expanded pipeline
+          expanded.nodes.forEach((node) => {
+            addNode(node);
+          });
+
+          // Add all edges from the expanded pipeline
+          if (expanded.edges.length > 0) {
+            addEdges(expanded.edges);
+          }
+
+          return;
+        }
+        // If expansion failed, fall through to create single node
+      }
+
+      // Default behavior: create single node
       const newNode = {
         id: generateId(),
         type: 'sparkle_component',
@@ -44,7 +71,7 @@ function App() {
 
       addNode(newNode);
     },
-    [addNode]
+    [addNode, addEdges]
   );
 
   const onDragOver = useCallback((event: React.DragEvent) => {

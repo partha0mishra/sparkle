@@ -5,6 +5,7 @@ import React from 'react';
 import { Handle, Position, type NodeProps } from 'reactflow';
 import { Database, Download, Zap, Brain, Upload, Code } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { IconDisplay } from '@/components/IconDisplay';
 
 const categoryIcons = {
   connection: Database,
@@ -23,8 +24,11 @@ const categoryColors = {
 };
 
 export function CustomNode({ data, selected }: NodeProps) {
-  const Icon = categoryIcons[data.component_type as keyof typeof categoryIcons] || Zap;
-  const colorClass = categoryColors[data.component_type as keyof typeof categoryColors] || 'bg-gray-500';
+  // Use visual_category for color if available (for task nodes from pipeline expansion)
+  // Otherwise use component_type (for regular nodes)
+  const categoryForVisual = data.visual_category || data.component_type;
+  const Icon = categoryIcons[categoryForVisual as keyof typeof categoryIcons] || Zap;
+  const colorClass = categoryColors[categoryForVisual as keyof typeof categoryColors] || 'bg-gray-500';
 
   return (
     <div
@@ -36,9 +40,14 @@ export function CustomNode({ data, selected }: NodeProps) {
       <Handle type="target" position={Position.Top} className="w-3 h-3" />
 
       <div className="flex items-center gap-2 mb-2">
-        <div className={cn('p-1.5 rounded', colorClass)}>
-          <Icon className="w-4 h-4 text-white" />
-        </div>
+        {/* Use component-specific icon if available, otherwise use category icon */}
+        {data.icon ? (
+          <IconDisplay icon={data.icon} className="w-4 h-4" bgColor={colorClass} showBackground={true} />
+        ) : (
+          <div className={cn('p-1.5 rounded', colorClass)}>
+            <Icon className="w-4 h-4 text-white" />
+          </div>
+        )}
         <div className="flex-1">
           <div className="font-semibold text-sm text-foreground">{data.label}</div>
           {data.component_name && (

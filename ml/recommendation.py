@@ -19,6 +19,9 @@ class ALSMatrixFactorization(BaseModelTrainer):
     """
     Alternating Least Squares collaborative filtering.
 
+    Sub-Group: Recommendation & Ranking
+    Tags: recommendation, ranking, collaborative-filtering, personalization
+
     Config example:
         {
             "train_table": "gold.user_item_ratings",
@@ -98,6 +101,9 @@ class ImplicitALS(BaseModelTrainer):
     """
     ALS for implicit feedback (clicks, views, plays).
 
+    Sub-Group: Recommendation & Ranking
+    Tags: recommendation, ranking, collaborative-filtering, personalization
+
     Config example:
         {
             "train_table": "gold.user_item_interactions",
@@ -153,6 +159,9 @@ class ImplicitALS(BaseModelTrainer):
 class TwoTowerModel(BaseModelTrainer):
     """
     Two-tower neural retrieval model for candidate generation.
+
+    Sub-Group: Recommendation & Ranking
+    Tags: recommendation, ranking, collaborative-filtering, personalization
 
     Config example:
         {
@@ -221,6 +230,9 @@ class ANNIndexBuilder(BaseModelTrainer):
     """
     Build Approximate Nearest Neighbor index for fast retrieval.
 
+    Sub-Group: Recommendation & Ranking
+    Tags: recommendation, ranking, collaborative-filtering, personalization
+
     Config example:
         {
             "embeddings_table": "gold.item_embeddings",
@@ -271,6 +283,9 @@ class ANNIndexBuilder(BaseModelTrainer):
 class LightFMTrainer(BaseModelTrainer):
     """
     LightFM hybrid recommender (collaborative + content-based).
+
+    Sub-Group: Recommendation & Ranking
+    Tags: recommendation, ranking, collaborative-filtering, personalization
 
     Config example:
         {
@@ -339,6 +354,9 @@ class SARRecommender(BaseModelTrainer):
     """
     Smart Adaptive Recommendations (SAR) algorithm.
 
+    Sub-Group: Recommendation & Ranking
+    Tags: recommendation, ranking, collaborative-filtering, personalization
+
     Config example:
         {
             "interactions_table": "gold.user_item_interactions",
@@ -393,6 +411,9 @@ class SARRecommender(BaseModelTrainer):
 class GRU4RecTrainer(BaseModelTrainer):
     """
     GRU-based session-based recommendations.
+
+    Sub-Group: Recommendation & Ranking
+    Tags: recommendation, ranking, collaborative-filtering, personalization
 
     Config example:
         {
@@ -453,6 +474,9 @@ class RankingFeatureGenerator(BaseModelTrainer):
     """
     Generate ranking features for Learning to Rank.
 
+    Sub-Group: Recommendation & Ranking
+    Tags: recommendation, ranking, collaborative-filtering, personalization
+
     Config example:
         {
             "candidates_table": "gold.recommendation_candidates",
@@ -504,6 +528,9 @@ class RankingFeatureGenerator(BaseModelTrainer):
 class LearningToRankTrainer(BaseModelTrainer):
     """
     Train LambdaMART or XGBoost ranker.
+
+    Sub-Group: Recommendation & Ranking
+    Tags: recommendation, ranking, collaborative-filtering, personalization
 
     Config example:
         {
@@ -586,6 +613,9 @@ class LearningToRankTrainer(BaseModelTrainer):
 class ContextualBanditTrainer(BaseModelTrainer):
     """
     Contextual bandit for exploration-exploitation in recommendations.
+
+    Sub-Group: Recommendation & Ranking
+    Tags: recommendation, ranking, collaborative-filtering, personalization
 
     Config example:
         {

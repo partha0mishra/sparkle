@@ -1610,10 +1610,17 @@ class AmplitudeConnection(APIConnection):
     """
     Amplitude Analytics Export API connection.
     Sub-Group: SaaS Platforms
-    
+
     Reads event data from Amplitude Export API.
-    
-    Example config:
+
+    Example config (config/connections/amplitude/prod.json):
+        {
+            "api_key": "${AMPLITUDE_API_KEY}",
+            "secret_key": "${AMPLITUDE_SECRET_KEY}",
+            "project_id": "12345"
+        }
+
+    Example config (YAML):
         amplitude_prod:
           type: amplitude
           api_key: secret://amplitude/api_key
@@ -1741,10 +1748,18 @@ class SegmentConnection(APIConnection):
     """
     Segment CDP connection via S3 export or Destinations.
     Sub-Group: SaaS Platforms
-    
+
     Reads event data from Segment S3 exports or via Personas/Profiles API.
-    
-    Example config:
+
+    Example config (config/connections/segment/prod.json):
+        {
+            "access_token": "${SEGMENT_ACCESS_TOKEN}",
+            "workspace_slug": "my-workspace",
+            "s3_bucket": "segment-logs",
+            "s3_prefix": "segment-logs/my-workspace/"
+        }
+
+    Example config (YAML):
         segment_prod:
           type: segment
           access_token: secret://segment/access_token

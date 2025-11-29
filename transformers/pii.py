@@ -15,6 +15,9 @@ def mask_column(df: DataFrame, columns: List[str], mask_char: str = "*", visible
     """
     Mask sensitive columns.
 
+    Sub-Group: PII & Anonymization
+    Tags: masking, privacy, pii
+
     Args:
         df: Input DataFrame
         columns: Columns to mask
@@ -56,6 +59,9 @@ def tokenize_column(df: DataFrame, columns: List[str], algorithm: str = "sha256"
     """
     Create irreversible tokens from sensitive columns.
 
+    Sub-Group: PII & Anonymization
+    Tags: tokenization, hashing, privacy
+
     Args:
         df: Input DataFrame
         columns: Columns to tokenize
@@ -86,6 +92,9 @@ def redact_email(df: DataFrame, columns: List[str]) -> DataFrame:
     """
     Redact email addresses while preserving domain.
 
+    Sub-Group: PII & Anonymization
+    Tags: email, redaction, privacy
+
     Usage:
         df = df.transform(redact_email, columns=["email"])
         # john.doe@example.com -> ****@example.com
@@ -104,6 +113,9 @@ def redact_email(df: DataFrame, columns: List[str]) -> DataFrame:
 def anonymize_with_lookup(df: DataFrame, column: str, lookup_dict: Dict[str, str]) -> DataFrame:
     """
     Anonymize using lookup dictionary.
+
+    Sub-Group: PII & Anonymization
+    Tags: anonymization, mapping, privacy
 
     Usage:
         df = df.transform(anonymize_with_lookup, column="customer_id", lookup_dict={"C001": "ANON_001", "C002": "ANON_002"})
@@ -125,6 +137,9 @@ def anonymize_with_lookup(df: DataFrame, column: str, lookup_dict: Dict[str, str
 def remove_pii_columns(df: DataFrame, pii_columns: List[str]) -> DataFrame:
     """
     Drop PII columns entirely.
+
+    Sub-Group: PII & Anonymization
+    Tags: removal, privacy, pii
 
     Usage:
         df = df.transform(remove_pii_columns, pii_columns=["ssn", "credit_card", "password"])

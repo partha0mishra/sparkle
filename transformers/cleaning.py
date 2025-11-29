@@ -18,6 +18,9 @@ def drop_exact_duplicates(df: DataFrame) -> DataFrame:
     """
     Drop exact duplicate rows.
 
+    Sub-Group: Core Cleaning & Standardization
+    Tags: deduplication, cleaning, duplicates
+
     Usage:
         df = df.transform(drop_exact_duplicates)
     """
@@ -28,6 +31,9 @@ def drop_exact_duplicates(df: DataFrame) -> DataFrame:
 def drop_duplicates_by_key(df: DataFrame, key_columns: List[str], keep: str = "first") -> DataFrame:
     """
     Drop duplicates based on key columns.
+
+    Sub-Group: Core Cleaning & Standardization
+    Tags: deduplication, cleaning, keys
 
     Args:
         df: Input DataFrame
@@ -58,8 +64,11 @@ def standardize_nulls(df: DataFrame, null_values: Optional[List[str]] = None) ->
     """
     Replace various null representations with actual NULL.
 
+    Sub-Group: Core Cleaning & Standardization
+    Tags: nulls, cleaning, standardization
+
     Args:
-        df: Input DataFrame  
+        df: Input DataFrame
         null_values: List of values to treat as NULL (default: common variants)
 
     Usage:
@@ -80,6 +89,9 @@ def standardize_nulls(df: DataFrame, null_values: Optional[List[str]] = None) ->
 def trim_and_clean_strings(df: DataFrame, columns: Optional[List[str]] = None) -> DataFrame:
     """
     Trim whitespace and clean string columns.
+
+    Sub-Group: Core Cleaning & Standardization
+    Tags: strings, cleaning, whitespace
 
     Args:
         df: Input DataFrame
@@ -106,6 +118,9 @@ def normalize_case(df: DataFrame, columns: List[str], case: str = "upper") -> Da
     """
     Normalize string case to upper/lower.
 
+    Sub-Group: Core Cleaning & Standardization
+    Tags: strings, case, normalization
+
     Args:
         df: Input DataFrame
         columns: Columns to normalize
@@ -128,6 +143,9 @@ def remove_special_characters(df: DataFrame, columns: List[str], replacement: st
     """
     Remove special characters from string columns.
 
+    Sub-Group: Core Cleaning & Standardization
+    Tags: strings, cleaning, special-characters
+
     Args:
         df: Input DataFrame
         columns: Columns to clean
@@ -149,6 +167,9 @@ def remove_special_characters(df: DataFrame, columns: List[str], replacement: st
 def replace_values(df: DataFrame, replacements: Dict[str, Dict]) -> DataFrame:
     """
     Replace specific values in columns.
+
+    Sub-Group: Core Cleaning & Standardization
+    Tags: mapping, replacement, standardization
 
     Args:
         df: Input DataFrame
@@ -179,6 +200,9 @@ def fill_nulls(df: DataFrame, fill_values: Dict[str, any]) -> DataFrame:
     """
     Fill NULL values with specified defaults.
 
+    Sub-Group: Core Cleaning & Standardization
+    Tags: nulls, filling, defaults
+
     Args:
         df: Input DataFrame
         fill_values: Dict of {column: fill_value}
@@ -197,6 +221,9 @@ def drop_null_rows(df: DataFrame, columns: Optional[List[str]] = None, how: str 
     """
     Drop rows with NULL values.
 
+    Sub-Group: Core Cleaning & Standardization
+    Tags: nulls, filtering, cleaning
+
     Args:
         df: Input DataFrame
         columns: Columns to check for NULLs (default: all)
@@ -212,6 +239,9 @@ def drop_null_rows(df: DataFrame, columns: Optional[List[str]] = None, how: str 
 def coalesce_columns(df: DataFrame, target_column: str, source_columns: List[str], drop_sources: bool = False) -> DataFrame:
     """
     Coalesce multiple columns into one (first non-null value).
+
+    Sub-Group: Core Cleaning & Standardization
+    Tags: nulls, coalesce, merging
 
     Args:
         df: Input DataFrame
@@ -239,6 +269,9 @@ def filter_by_condition(df: DataFrame, condition: str) -> DataFrame:
     """
     Filter DataFrame by SQL-like condition.
 
+    Sub-Group: Core Cleaning & Standardization
+    Tags: filtering, condition, sql
+
     Args:
         df: Input DataFrame
         condition: SQL WHERE clause condition
@@ -253,6 +286,9 @@ def filter_by_condition(df: DataFrame, condition: str) -> DataFrame:
 def remove_outliers_iqr(df: DataFrame, column: str, multiplier: float = 1.5) -> DataFrame:
     """
     Remove outliers using IQR (Interquartile Range) method.
+
+    Sub-Group: Core Cleaning & Standardization
+    Tags: outliers, statistics, cleaning
 
     Args:
         df: Input DataFrame
@@ -277,6 +313,9 @@ def deduplicate_array_column(df: DataFrame, column: str) -> DataFrame:
     """
     Remove duplicates from array column.
 
+    Sub-Group: Core Cleaning & Standardization
+    Tags: arrays, deduplication, complex-types
+
     Args:
         df: Input DataFrame
         column: Array column to deduplicate
@@ -291,6 +330,9 @@ def deduplicate_array_column(df: DataFrame, column: str) -> DataFrame:
 def remove_empty_arrays(df: DataFrame, column: str) -> DataFrame:
     """
     Replace empty arrays with NULL.
+
+    Sub-Group: Core Cleaning & Standardization
+    Tags: arrays, nulls, complex-types
 
     Args:
         df: Input DataFrame
@@ -309,6 +351,9 @@ def remove_empty_arrays(df: DataFrame, column: str) -> DataFrame:
 def clean_email_addresses(df: DataFrame, columns: List[str]) -> DataFrame:
     """
     Clean and validate email addresses.
+
+    Sub-Group: Core Cleaning & Standardization
+    Tags: email, validation, cleaning
 
     Args:
         df: Input DataFrame
@@ -334,6 +379,9 @@ def clean_phone_numbers(df: DataFrame, columns: List[str], country_code: Optiona
     """
     Clean phone numbers to standard format.
 
+    Sub-Group: Core Cleaning & Standardization
+    Tags: phone, validation, cleaning
+
     Args:
         df: Input DataFrame
         columns: Phone columns to clean
@@ -342,6 +390,8 @@ def clean_phone_numbers(df: DataFrame, columns: List[str], country_code: Optiona
     Usage:
         df = df.transform(clean_phone_numbers, columns=["phone"], country_code="+1")
     """
+    from pyspark.sql.functions import concat
+
     for column in columns:
         if column in df.columns:
             # Remove all non-digit characters
@@ -355,5 +405,61 @@ def clean_phone_numbers(df: DataFrame, columns: List[str], country_code: Optiona
                          concat(lit(country_code), col(column))
                     ).otherwise(col(column))
                 )
+
+    return df
+
+
+@transformer
+def normalize_whitespace(df: DataFrame, columns: Optional[List[str]] = None) -> DataFrame:
+    """
+    Normalize whitespace in string columns (multiple spaces to single space).
+
+    Sub-Group: Core Cleaning & Standardization
+    Tags: strings, whitespace, normalization
+
+    Args:
+        df: Input DataFrame
+        columns: Columns to normalize (default: all string columns)
+
+    Usage:
+        df = df.transform(normalize_whitespace, columns=["description", "notes"])
+    """
+    if columns is None:
+        columns = [field.name for field in df.schema.fields if str(field.dataType) == "StringType"]
+
+    for column in columns:
+        if column in df.columns:
+            df = df.withColumn(column, regexp_replace(trim(col(column)), r'\s+', ' '))
+
+    return df
+
+
+@transformer
+def cap_numeric_values(df: DataFrame, column: str, min_value: Optional[float] = None,
+                      max_value: Optional[float] = None) -> DataFrame:
+    """
+    Cap numeric values to min/max thresholds.
+
+    Sub-Group: Core Cleaning & Standardization
+    Tags: numeric, capping, outliers
+
+    Args:
+        df: Input DataFrame
+        column: Numeric column to cap
+        min_value: Minimum allowed value
+        max_value: Maximum allowed value
+
+    Usage:
+        df = df.transform(cap_numeric_values, column="age", min_value=0, max_value=120)
+        df = df.transform(cap_numeric_values, column="price", max_value=9999.99)
+    """
+    from pyspark.sql.functions import greatest, least
+
+    if min_value is not None and max_value is not None:
+        df = df.withColumn(column, least(greatest(col(column), lit(min_value)), lit(max_value)))
+    elif min_value is not None:
+        df = df.withColumn(column, greatest(col(column), lit(min_value)))
+    elif max_value is not None:
+        df = df.withColumn(column, least(col(column), lit(max_value)))
 
     return df

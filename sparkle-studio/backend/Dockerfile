@@ -19,6 +19,7 @@ RUN apt-get update && apt-get install -y default-jre-headless \
     && rm -rf /var/lib/apt/lists/*
 
 ENV JAVA_HOME=/usr/lib/jvm/default-java
+ENV PYTHONPATH=/app:/opt/sparkle:$PYTHONPATH
 
 # Stage: Dependencies
 FROM base as dependencies

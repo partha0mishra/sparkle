@@ -21,6 +21,9 @@ def aggregate_by_key(df: DataFrame, group_by: List[str], aggregations: Dict[str,
     """
     Aggregate DataFrame by key columns.
 
+    Sub-Group: Aggregation & Windowing
+    Tags: aggregation, groupby, metrics
+
     Args:
         df: Input DataFrame
         group_by: Columns to group by
@@ -62,6 +65,9 @@ def pivot_table(df: DataFrame, index: List[str], columns: str, values: str, agg_
     """
     Create pivot table.
 
+    Sub-Group: Aggregation & Windowing
+    Tags: pivot, reshape, aggregation
+
     Args:
         df: Input DataFrame
         index: Columns for rows
@@ -95,6 +101,9 @@ def add_running_total(df: DataFrame, partition_by: List[str], order_by: List[str
     """
     Add running total within partitions.
 
+    Sub-Group: Aggregation & Windowing
+    Tags: window-functions, running-total, cumulative
+
     Usage:
         df = df.transform(add_running_total,
             partition_by=["customer_id"],
@@ -117,6 +126,9 @@ def add_running_total(df: DataFrame, partition_by: List[str], order_by: List[str
 def add_moving_average(df: DataFrame, partition_by: List[str], order_by: List[str], value_column: str, window_size: int, target_column: str = "moving_avg") -> DataFrame:
     """
     Add moving average.
+
+    Sub-Group: Aggregation & Windowing
+    Tags: window-functions, moving-average, time-series
 
     Args:
         df: Input DataFrame
@@ -150,6 +162,9 @@ def add_lag_lead_columns(df: DataFrame, partition_by: List[str], order_by: List[
     """
     Add lag (previous) and lead (next) columns.
 
+    Sub-Group: Aggregation & Windowing
+    Tags: window-functions, lag, lead
+
     Usage:
         df = df.transform(add_lag_lead_columns,
             partition_by=["customer_id"],
@@ -173,6 +188,9 @@ def add_percentile_rank(df: DataFrame, partition_by: List[str], order_by: List[s
     """
     Add percentile rank.
 
+    Sub-Group: Aggregation & Windowing
+    Tags: window-functions, ranking, percentile
+
     Usage:
         df = df.transform(add_percentile_rank,
             partition_by=["category"],
@@ -189,6 +207,9 @@ def add_percentile_rank(df: DataFrame, partition_by: List[str], order_by: List[s
 def add_ntile(df: DataFrame, partition_by: List[str], order_by: List[str], n: int, target_column: str = "ntile") -> DataFrame:
     """
     Add ntile (divide into N buckets).
+
+    Sub-Group: Aggregation & Windowing
+    Tags: window-functions, bucketing, ntile
 
     Usage:
         df = df.transform(add_ntile,
@@ -207,6 +228,9 @@ def add_ntile(df: DataFrame, partition_by: List[str], order_by: List[str], n: in
 def rollup_aggregation(df: DataFrame, group_by: List[str], agg_column: str, agg_func: str = "sum") -> DataFrame:
     """
     Perform rollup aggregation (creates subtotals).
+
+    Sub-Group: Aggregation & Windowing
+    Tags: rollup, hierarchical, subtotals
 
     Usage:
         df = df.transform(rollup_aggregation,
@@ -231,6 +255,9 @@ def cube_aggregation(df: DataFrame, group_by: List[str], agg_column: str, agg_fu
     """
     Perform cube aggregation (all possible combinations).
 
+    Sub-Group: Aggregation & Windowing
+    Tags: cube, olap, cross-tabulation
+
     Usage:
         df = df.transform(cube_aggregation,
             group_by=["region", "category"],
@@ -247,3 +274,24 @@ def cube_aggregation(df: DataFrame, group_by: List[str], agg_column: str, agg_fu
     agg_function = agg_map.get(agg_func, spark_sum)
 
     return df.cube(*group_by).agg(agg_function(col(agg_column)).alias(f"{agg_column}_{agg_func}"))
+
+
+@transformer
+def add_cumulative_distribution(df: DataFrame, partition_by: List[str], order_by: List[str],
+                               target_column: str = "cumulative_dist") -> DataFrame:
+    """
+    Add cumulative distribution function.
+
+    Sub-Group: Aggregation & Windowing
+    Tags: window-functions, distribution, statistics
+
+    Usage:
+        df = df.transform(add_cumulative_distribution,
+            partition_by=["category"],
+            order_by=["amount"],
+            target_column="cume_dist"
+        )
+    """
+    window = Window.partitionBy(*[col(c) for c in partition_by]).orderBy(*[col(c) for c in order_by])
+
+    return df.withColumn(target_column, cume_dist().over(window))

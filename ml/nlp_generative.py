@@ -18,6 +18,9 @@ class ZeroShotClassifier(BaseModelTrainer):
     """
     Zero-shot text classification using pre-trained models.
 
+    Sub-Group: NLP & Generative
+    Tags: nlp, text, language-models, generation
+
     Config example:
         {
             "input_table": "silver.customer_feedback",
@@ -74,6 +77,9 @@ class MultilingualSentiment(BaseModelTrainer):
     """
     Multilingual sentiment analysis using mBERT or XLM-RoBERTa.
 
+    Sub-Group: NLP & Generative
+    Tags: nlp, text, language-models, generation
+
     Config example:
         {
             "input_table": "silver.multilingual_reviews",
@@ -121,6 +127,9 @@ class MultilingualSentiment(BaseModelTrainer):
 class SparkNLPNER(BaseModelTrainer):
     """
     Named Entity Recognition using Spark NLP.
+
+    Sub-Group: NLP & Generative
+    Tags: nlp, text, language-models, generation
 
     Config example:
         {
@@ -195,6 +204,9 @@ class BERTopicTrainer(BaseModelTrainer):
     """
     Topic modeling using BERTopic.
 
+    Sub-Group: NLP & Generative
+    Tags: nlp, text, language-models, generation
+
     Config example:
         {
             "input_table": "silver.documents",
@@ -253,6 +265,9 @@ class TextSimilarityScorer(BaseModelTrainer):
     """
     Calculate semantic text similarity using sentence transformers.
 
+    Sub-Group: NLP & Generative
+    Tags: nlp, text, language-models, generation
+
     Config example:
         {
             "input_table": "silver.text_pairs",
@@ -299,6 +314,9 @@ class TextSimilarityScorer(BaseModelTrainer):
 class LLMStructuredExtractor(BaseModelTrainer):
     """
     Extract structured data from unstructured text using LLMs.
+
+    Sub-Group: NLP & Generative
+    Tags: nlp, text, language-models, generation
 
     Config example:
         {
@@ -370,6 +388,9 @@ class PromptTemplateEngine(BaseModelTrainer):
     """
     Generate prompts from templates with dynamic variables.
 
+    Sub-Group: NLP & Generative
+    Tags: nlp, text, language-models, generation
+
     Config example:
         {
             "input_table": "silver.prompt_inputs",
@@ -407,6 +428,9 @@ class PromptTemplateEngine(BaseModelTrainer):
 class TextSummarizer(BaseModelTrainer):
     """
     Abstractive text summarization using transformer models.
+
+    Sub-Group: NLP & Generative
+    Tags: nlp, text, language-models, generation
 
     Config example:
         {

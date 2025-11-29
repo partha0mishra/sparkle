@@ -17,9 +17,12 @@ import time
 class PaginatedRestJsonIngestion(BaseBatchIngestor):
     """
     Generic paginated REST API with JSON response.
-    
+
+    Sub-Group: Generic API
+    Tags: rest-api, json, pagination, cursor, offset, generic
+
     Supports cursor, offset, and page-number pagination.
-    
+
     Config example:
         {
             "source_name": "generic_api_data",
@@ -112,7 +115,10 @@ class PaginatedRestJsonIngestion(BaseBatchIngestor):
 class PaginatedRestCsvIngestion(BaseBatchIngestor):
     """
     Generic REST API returning CSV.
-    
+
+    Sub-Group: Generic API
+    Tags: rest-api, csv, generic, export
+
     Config example:
         {
             "source_name": "csv_api_data",
@@ -154,7 +160,10 @@ class PaginatedRestCsvIngestion(BaseBatchIngestor):
 class GraphQLPaginatedIngestion(BaseBatchIngestor):
     """
     Generic GraphQL API with cursor pagination.
-    
+
+    Sub-Group: Generic API
+    Tags: graphql, pagination, cursor, generic
+
     Config example:
         {
             "source_name": "graphql_data",
@@ -245,10 +254,13 @@ class GraphQLPaginatedIngestion(BaseBatchIngestor):
 class WebhookToDeltaIngestion(BaseStreamingIngestor):
     """
     HTTP webhook receiver -> raw bronze table.
-    
+
+    Sub-Group: Generic API
+    Tags: webhook, streaming, kafka, delta, http
+
     Note: This requires a separate webhook receiver service
     that writes to a Kafka topic or Delta table.
-    
+
     Config example:
         {
             "source_name": "webhooks",

@@ -19,6 +19,9 @@ class BatchScorer(BaseModelScorer):
     """
     Batch scoring for large datasets with checkpoint support.
 
+    Sub-Group: Model Serving & Inference
+    Tags: inference, serving, predictions, scoring
+
     Config example:
         {
             "input_table": "gold.score_data",
@@ -78,6 +81,9 @@ class RealTimeScorer(BaseModelScorer):
     """
     Real-time REST API endpoint for model serving.
 
+    Sub-Group: Model Serving & Inference
+    Tags: inference, serving, predictions, scoring
+
     Config example:
         {
             "model_name": "churn_model",
@@ -131,6 +137,9 @@ class RealTimeScorer(BaseModelScorer):
 class StructuredStreamingScorer(BaseModelScorer):
     """
     Real-time scoring on Structured Streaming data.
+
+    Sub-Group: Model Serving & Inference
+    Tags: inference, serving, predictions, scoring
 
     Config example:
         {
@@ -197,6 +206,9 @@ class FeatureStoreOnlineLookupScorer(BaseModelScorer):
     """
     Low-latency scoring with online feature store lookups.
 
+    Sub-Group: Model Serving & Inference
+    Tags: inference, serving, predictions, scoring
+
     Config example:
         {
             "model_name": "recommendation_model",
@@ -252,6 +264,9 @@ class FeatureStoreOnlineLookupScorer(BaseModelScorer):
 class ModelDriftMonitor(BaseModelScorer):
     """
     Monitor model drift using PSI, KS, or statistical tests.
+
+    Sub-Group: Model Serving & Inference
+    Tags: inference, serving, predictions, scoring
 
     Config example:
         {
@@ -318,6 +333,9 @@ class PredictionExplanationLogger(BaseModelScorer):
     """
     Log SHAP/LIME explanations for each prediction.
 
+    Sub-Group: Model Serving & Inference
+    Tags: inference, serving, predictions, scoring
+
     Config example:
         {
             "input_table": "gold.score_data",
@@ -372,6 +390,9 @@ class ProbabilityCalibration(BaseModelScorer):
     """
     Calibrate prediction probabilities using Platt scaling or isotonic regression.
 
+    Sub-Group: Model Serving & Inference
+    Tags: inference, serving, predictions, scoring
+
     Config example:
         {
             "input_table": "gold.validation_predictions",
@@ -423,6 +444,9 @@ class RejectionInference(BaseModelScorer):
     """
     Incorporate rejected applications into training data.
 
+    Sub-Group: Model Serving & Inference
+    Tags: inference, serving, predictions, scoring
+
     Config example:
         {
             "accepted_table": "gold.accepted_applications",
@@ -470,6 +494,9 @@ class RejectionInference(BaseModelScorer):
 class WhatIfCounterfactualGenerator(BaseModelScorer):
     """
     Generate counterfactual explanations (what-if scenarios).
+
+    Sub-Group: Model Serving & Inference
+    Tags: inference, serving, predictions, scoring
 
     Config example:
         {
@@ -538,6 +565,9 @@ class ModelVersionRouter(BaseModelScorer):
     """
     Route traffic between multiple model versions (A/B testing).
 
+    Sub-Group: Model Serving & Inference
+    Tags: inference, serving, predictions, scoring
+
     Config example:
         {
             "input_table": "gold.score_requests",
@@ -597,6 +627,9 @@ class ShadowModeScorer(BaseModelScorer):
     """
     Run new model in shadow mode (score but don't serve).
 
+    Sub-Group: Model Serving & Inference
+    Tags: inference, serving, predictions, scoring
+
     Config example:
         {
             "input_table": "gold.production_traffic",
@@ -655,6 +688,9 @@ class WarmPoolModelCache(BaseModelScorer):
     """
     Pre-warm model cache for low-latency serving.
 
+    Sub-Group: Model Serving & Inference
+    Tags: inference, serving, predictions, scoring
+
     Config example:
         {
             "model_names": ["model1", "model2", "model3"],
@@ -693,6 +729,9 @@ class WarmPoolModelCache(BaseModelScorer):
 class ModelRollbackAutomator(BaseModelScorer):
     """
     Automatically rollback model if performance degrades.
+
+    Sub-Group: Model Serving & Inference
+    Tags: inference, serving, predictions, scoring
 
     Config example:
         {
@@ -753,6 +792,9 @@ class PredictionAuditTrail(BaseModelScorer):
     """
     Log all predictions for audit and compliance.
 
+    Sub-Group: Model Serving & Inference
+    Tags: inference, serving, predictions, scoring
+
     Config example:
         {
             "input_table": "gold.score_requests",
@@ -804,6 +846,9 @@ class PredictionAuditTrail(BaseModelScorer):
 class ModelMonitoringDashboard(BaseModelScorer):
     """
     Generate model monitoring dashboard data.
+
+    Sub-Group: Model Serving & Inference
+    Tags: inference, serving, predictions, scoring
 
     Config example:
         {

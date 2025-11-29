@@ -1,0 +1,22 @@
+{
+    "pipeline_name": "customer_gold_aggregation",
+    "pipeline_type": "GoldDailyAggregatePipeline",
+    "env": "prod",
+    "source_table": "sparkle_prod.silver_sales.customers",
+    "destination_catalog": "sparkle_prod",
+    "destination_schema": "gold_sales",
+    "destination_table": "customer_stats",
+    "partition_columns": [
+        "date"
+    ],
+    "extra_config": {
+        "group_by": [
+            "date",
+            "region"
+        ],
+        "measures": {
+            "count": "count(*)",
+            "total_revenue": "sum(revenue)"
+        }
+    }
+}

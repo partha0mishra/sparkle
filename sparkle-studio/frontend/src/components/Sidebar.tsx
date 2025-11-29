@@ -6,12 +6,14 @@ import { Database, Download, Zap, Brain, Upload, Search, ChevronDown, ChevronRig
 import { useComponents } from '@/hooks/useComponents';
 import { usePipelineStore } from '@/store/pipelineStore';
 import type { ComponentMetadata } from '@/types/component';
+import { SidebarIcon } from '@/components/IconDisplay';
 
 const categoryIcons = {
   source: Plug,
   ingestor: Download,
   transformer: Zap,
   ml: Brain,
+  orchestrator: Database,
   destination: Upload,
 };
 
@@ -20,6 +22,7 @@ const categoryColors = {
   ingestor: 'text-green-500',
   transformer: 'text-purple-500',
   ml: 'text-orange-500',
+  orchestrator: 'text-cyan-500',
   destination: 'text-red-500',
 };
 
@@ -38,7 +41,11 @@ function CollapsibleSection({ title, icon: Icon, count, color, children, default
   return (
     <div>
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          setIsOpen(!isOpen);
+        }}
         className="w-full flex items-center gap-2 mb-2 hover:bg-accent px-2 py-1 rounded transition-colors"
       >
         {isOpen ? (
@@ -56,20 +63,80 @@ function CollapsibleSection({ title, icon: Icon, count, color, children, default
   );
 }
 
+interface SubGroupSectionProps {
+  title: string;
+  count: number;
+  children: React.ReactNode;
+  defaultOpen?: boolean;
+}
+
+function SubGroupSection({ title, count, children, defaultOpen = false }: SubGroupSectionProps) {
+  const [isOpen, setIsOpen] = useState(defaultOpen);
+
+  return (
+    <div className="mb-3">
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          setIsOpen(!isOpen);
+        }}
+        className="w-full flex items-center gap-2 mb-2 px-2 py-1 rounded hover:bg-accent/50 transition-colors"
+      >
+        {isOpen ? (
+          <ChevronDown className="w-3 h-3 text-muted-foreground" />
+        ) : (
+          <ChevronRight className="w-3 h-3 text-muted-foreground" />
+        )}
+        <div className="text-xs font-semibold text-muted-foreground flex-1 text-left">
+          {title} ({count})
+        </div>
+      </button>
+
+      {isOpen && <div className="space-y-1">{children}</div>}
+    </div>
+  );
+}
+
 export function Sidebar() {
   const { components, isLoading, error } = useComponents();
   const [searchQuery, setSearchQuery] = React.useState('');
-  const { addNode } = usePipelineStore();
+  const { addNode, setSelectedComponent } = usePipelineStore();
 
-  // Reorganize components into Source, Ingestor, Transformer, ML, and Destination with sub-groups
+  // Reorganize components into Source, Ingestor, Transformer, ML, Orchestrator, and Destination with sub-groups
   const organizedSections = useMemo(() => {
-    if (!components) return { source: {}, ingestor: {}, transformer: {}, ml: {}, destination: {} };
+    if (!components) return { source: {}, ingestor: {}, transformer: {}, ml: {}, orchestrator: {}, destination: {} };
 
     const source: Record<string, ComponentMetadata[]> = {};
     const ingestor: Record<string, ComponentMetadata[]> = {};
     const transformer: Record<string, ComponentMetadata[]> = {};
     const ml: Record<string, ComponentMetadata[]> = {};
+    const orchestrator: Record<string, ComponentMetadata[]> = {};
     const destination: Record<string, ComponentMetadata[]> = {};
+
+    // Helper to add component with deduplication
+    const addComponent = (targetSection: Record<string, any[]>, subGroupName: string, component: ComponentMetadata) => {
+      if (!targetSection[subGroupName]) {
+        targetSection[subGroupName] = [];
+      }
+
+      // Check for existing component with same display name
+      const existingIndex = targetSection[subGroupName].findIndex(
+        (c) => c.display_name === component.display_name
+      );
+
+      if (existingIndex >= 0) {
+        // Add as alias to existing component
+        const existing = targetSection[subGroupName][existingIndex];
+        if (!existing.aliases) {
+          existing.aliases = [];
+        }
+        existing.aliases.push(component);
+      } else {
+        // Add new component
+        targetSection[subGroupName].push({ ...component });
+      }
+    };
 
     components.groups.forEach((group) => {
       // Use sub_groups if available, otherwise organize components directly
@@ -97,13 +164,11 @@ export function Sidebar() {
             else if (group.category === 'ingestor') targetSection = ingestor;
             else if (group.category === 'transformer') targetSection = transformer;
             else if (group.category === 'ml') targetSection = ml;
+            else if (group.category === 'orchestrator') targetSection = orchestrator;
             else if (group.category === 'sink') targetSection = destination;
 
             if (targetSection) {
-              if (!targetSection[subGroupName]) {
-                targetSection[subGroupName] = [];
-              }
-              targetSection[subGroupName].push(component);
+              addComponent(targetSection, subGroupName, component);
             }
           });
         });
@@ -127,19 +192,17 @@ export function Sidebar() {
           else if (group.category === 'ingestor') targetSection = ingestor;
           else if (group.category === 'transformer') targetSection = transformer;
           else if (group.category === 'ml') targetSection = ml;
+          else if (group.category === 'orchestrator') targetSection = orchestrator;
           else if (group.category === 'sink') targetSection = destination;
 
           if (targetSection) {
-            if (!targetSection[subGroupName]) {
-              targetSection[subGroupName] = [];
-            }
-            targetSection[subGroupName].push(component);
+            addComponent(targetSection, subGroupName, component);
           }
         });
       }
     });
 
-    return { source, ingestor, transformer, ml, destination };
+    return { source, ingestor, transformer, ml, orchestrator, destination };
   }, [components, searchQuery]);
 
   const onDragStart = (event: React.DragEvent, component: ComponentMetadata) => {
@@ -151,28 +214,45 @@ export function Sidebar() {
         label: component.display_name,
         config: {},
         description: component.description,
+        icon: component.icon, // Include icon for display
       })
     );
     event.dataTransfer.effectAllowed = 'move';
   };
 
   // Helper function to render component card
-  const renderComponentCard = (component: ComponentMetadata, iconComponent: React.ElementType, iconColor: string) => (
+  const renderComponentCard = (component: ComponentMetadata & { aliases?: ComponentMetadata[] }, iconComponent: React.ElementType, iconColor: string) => (
     <div
       key={component.name}
       draggable
       onDragStart={(e) => onDragStart(e, component)}
-      className="p-3 rounded-md border border-border bg-background hover:bg-accent cursor-move transition-colors"
+      onClick={() => setSelectedComponent(component)}
+      className="p-3 rounded-md border border-border bg-background hover:bg-accent cursor-pointer transition-colors"
     >
       <div className="flex items-center gap-2">
-        {React.createElement(iconComponent, { className: `w-4 h-4 ${iconColor}` })}
-        <div className="font-medium text-sm">{component.display_name}</div>
-      </div>
-      {component.description && (
-        <div className="text-xs text-muted-foreground mt-1 line-clamp-2">
-          {component.description}
+        {/* Use component-specific icon if available (for connections), otherwise use category icon */}
+        {component.icon ? (
+          <SidebarIcon icon={component.icon} className={`w-4 h-4 ${iconColor}`} />
+        ) : (
+          React.createElement(iconComponent, { className: `w-4 h-4 ${iconColor}` })
+        )}
+        <div className="font-medium text-sm flex-1">
+          {component.display_name}
+          {component.aliases && component.aliases.length > 0 && (
+            <span className="text-xs text-muted-foreground ml-1" title={`Aliases: ${component.aliases.map(c => c.name).join(', ')}`}>
+              (+{component.aliases.length})
+            </span>
+          )}
         </div>
-      )}
+      </div>
+
+      {
+        component.description && (
+          <div className="text-xs text-muted-foreground mt-1 line-clamp-2">
+            {component.description}
+          </div>
+        )
+      }
       <div className="flex gap-1 mt-2">
         {component.is_streaming && (
           <span className="text-xs px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-500">
@@ -185,7 +265,7 @@ export function Sidebar() {
           </span>
         )}
       </div>
-    </div>
+    </div >
   );
 
   // Helper to render components grouped by sub-group
@@ -201,16 +281,16 @@ export function Sidebar() {
       return subGroups['Other'].map((component) => renderComponentCard(component, iconComponent, iconColor));
     }
 
-    // Render with sub-group headers
-    return subGroupNames.map((subGroupName) => (
-      <div key={subGroupName} className="mb-3">
-        <div className="text-xs font-semibold text-muted-foreground mb-2 px-2">
-          {subGroupName} ({subGroups[subGroupName].length})
-        </div>
-        <div className="space-y-1">
-          {subGroups[subGroupName].map((component) => renderComponentCard(component, iconComponent, iconColor))}
-        </div>
-      </div>
+    // Render with collapsible sub-group sections
+    return subGroupNames.map((subGroupName, index) => (
+      <SubGroupSection
+        key={subGroupName}
+        title={subGroupName}
+        count={subGroups[subGroupName].length}
+        defaultOpen={index === 0} // First sub-group open by default
+      >
+        {subGroups[subGroupName].map((component) => renderComponentCard(component, iconComponent, iconColor))}
+      </SubGroupSection>
     ));
   };
 
@@ -241,6 +321,7 @@ export function Sidebar() {
     Object.values(organizedSections.ingestor).flat().length +
     Object.values(organizedSections.transformer).flat().length +
     Object.values(organizedSections.ml).flat().length +
+    Object.values(organizedSections.orchestrator).flat().length +
     Object.values(organizedSections.destination).flat().length;
 
   if (!components || totalComponents === 0) {
@@ -279,7 +360,7 @@ export function Sidebar() {
         {/* Source Section */}
         {Object.keys(organizedSections.source).length > 0 && (
           <CollapsibleSection
-            title="Source"
+            title="Source/ Destinations"
             icon={categoryIcons.source}
             count={Object.values(organizedSections.source).flat().length}
             color={categoryColors.source}
@@ -325,6 +406,19 @@ export function Sidebar() {
             defaultOpen={true}
           >
             {renderComponentsWithSubGroups(organizedSections.ml, Brain, 'text-orange-500')}
+          </CollapsibleSection>
+        )}
+
+        {/* Orchestrators Section */}
+        {Object.keys(organizedSections.orchestrator).length > 0 && (
+          <CollapsibleSection
+            title="Orchestrators"
+            icon={categoryIcons.orchestrator}
+            count={Object.values(organizedSections.orchestrator).flat().length}
+            color={categoryColors.orchestrator}
+            defaultOpen={true}
+          >
+            {renderComponentsWithSubGroups(organizedSections.orchestrator, Database, 'text-cyan-500')}
           </CollapsibleSection>
         )}
 

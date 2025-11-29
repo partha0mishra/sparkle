@@ -12,6 +12,7 @@ class ComponentCategoryEnum(str, Enum):
     INGESTOR = "ingestor"
     TRANSFORMER = "transformer"
     ML = "ml"
+    ORCHESTRATOR = "orchestrator"
     SINK = "sink"
 
 

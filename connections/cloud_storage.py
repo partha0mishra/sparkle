@@ -4,7 +4,7 @@ Cloud storage connections for S3, Azure Data Lake, Google Cloud Storage.
 Handles authentication, path resolution, and Spark configuration.
 """
 
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 from pyspark.sql import SparkSession
 
 from .base import CloudStorageConnection

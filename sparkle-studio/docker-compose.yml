@@ -19,8 +19,12 @@ services:
       - SPARKLE_ENGINE_PATH=/opt/sparkle
       - SECRET_KEY=dev-secret-key-change-in-production
     volumes:
-      # Mount Sparkle engine from host
-      - ../sparkle:/opt/sparkle/sparkle:ro
+      # Mount component directories from parent sparkle framework
+      - ../connections:/opt/sparkle/connections:ro
+      - ../ingestors:/opt/sparkle/ingestors:ro
+      - ../transformers:/opt/sparkle/transformers:ro
+      - ../ml:/opt/sparkle/ml:ro
+      - ../orchestrators:/opt/sparkle/orchestrators:ro
       # Mount Git repository (persistent)
       - ./data/git_repo:/app/git_repo
       # Mount config

@@ -22,6 +22,9 @@ class MultiSeriesProphet(BaseModelTrainer):
     """
     Prophet forecasting for multiple time series.
 
+    Sub-Group: Time-Series & Forecasting
+    Tags: time-series, forecasting, predictions, temporal
+
     Config example:
         {
             "input_table": "gold.timeseries_data",
@@ -93,6 +96,9 @@ class HierarchicalReconciler(BaseModelTrainer):
     """
     Hierarchical forecast reconciliation (bottom-up, top-down).
 
+    Sub-Group: Time-Series & Forecasting
+    Tags: time-series, forecasting, predictions, temporal
+
     Config example:
         {
             "forecasts_table": "gold.hierarchical_forecasts",
@@ -140,6 +146,9 @@ class HierarchicalReconciler(BaseModelTrainer):
 class GlobalLightGBMForecaster(BaseModelTrainer):
     """
     Global LightGBM model for all series with time/series features.
+
+    Sub-Group: Time-Series & Forecasting
+    Tags: time-series, forecasting, predictions, temporal
 
     Config example:
         {
@@ -212,6 +221,9 @@ class ForecastAccuracyTracker(BaseModelTrainer):
     """
     Track forecast accuracy over time with MAE, RMSE, MAPE.
 
+    Sub-Group: Time-Series & Forecasting
+    Tags: time-series, forecasting, predictions, temporal
+
     Config example:
         {
             "forecasts_table": "gold.forecasts",
@@ -277,6 +289,9 @@ class ProbabilisticQuantileForecast(BaseModelTrainer):
     """
     Probabilistic forecasting with quantile regression.
 
+    Sub-Group: Time-Series & Forecasting
+    Tags: time-series, forecasting, predictions, temporal
+
     Config example:
         {
             "train_table": "gold.timeseries_features",
@@ -341,6 +356,9 @@ class ExogenousFeatureJoiner(BaseModelTrainer):
     """
     Join time-series with exogenous features (weather, holidays, etc).
 
+    Sub-Group: Time-Series & Forecasting
+    Tags: time-series, forecasting, predictions, temporal
+
     Config example:
         {
             "timeseries_table": "gold.sales_timeseries",
@@ -378,6 +396,9 @@ class ExogenousFeatureJoiner(BaseModelTrainer):
 class CalendarFourierFeatures(BaseModelTrainer):
     """
     Generate Fourier features for seasonality.
+
+    Sub-Group: Time-Series & Forecasting
+    Tags: time-series, forecasting, predictions, temporal
 
     Config example:
         {
@@ -432,6 +453,9 @@ class CalendarFourierFeatures(BaseModelTrainer):
 class LagFeatureGenerator(BaseModelTrainer):
     """
     Generate lag features for time-series forecasting.
+
+    Sub-Group: Time-Series & Forecasting
+    Tags: time-series, forecasting, predictions, temporal
 
     Config example:
         {
@@ -490,6 +514,9 @@ class LagFeatureGenerator(BaseModelTrainer):
 class HolidayEffectEncoder(BaseModelTrainer):
     """
     Encode holiday effects in time-series.
+
+    Sub-Group: Time-Series & Forecasting
+    Tags: time-series, forecasting, predictions, temporal
 
     Config example:
         {
@@ -557,6 +584,9 @@ class ForecastBiasCorrector(BaseModelTrainer):
     """
     Correct systematic forecast bias.
 
+    Sub-Group: Time-Series & Forecasting
+    Tags: time-series, forecasting, predictions, temporal
+
     Config example:
         {
             "forecasts_table": "gold.raw_forecasts",
@@ -617,6 +647,9 @@ class ResidualAnomalyDetector(BaseModelTrainer):
     """
     Detect anomalies in forecast residuals.
 
+    Sub-Group: Time-Series & Forecasting
+    Tags: time-series, forecasting, predictions, temporal
+
     Config example:
         {
             "forecasts_table": "gold.forecasts",
@@ -662,6 +695,9 @@ class ResidualAnomalyDetector(BaseModelTrainer):
 class ForecastVersionController(BaseModelTrainer):
     """
     Version control for forecasts with comparison and rollback.
+
+    Sub-Group: Time-Series & Forecasting
+    Tags: time-series, forecasting, predictions, temporal
 
     Config example:
         {

@@ -25,7 +25,17 @@ class FHIRConnection(APIConnection):
     Reads healthcare data from FHIR R4/R5 compliant servers.
     Supports Patient, Observation, Encounter, MedicationRequest, etc.
 
-    Example config:
+    Example config (config/connections/fhir/prod.json):
+        {
+            "base_url": "https://fhir.example.com/api/v1",
+            "auth_type": "oauth2",
+            "client_id": "${FHIR_CLIENT_ID}",
+            "client_secret": "${FHIR_CLIENT_SECRET}",
+            "token_url": "https://auth.example.com/oauth/token",
+            "fhir_version": "R4"
+        }
+
+    Example config (YAML):
         fhir_prod:
           type: fhir
           base_url: https://fhir.example.com/api/v1
@@ -216,7 +226,17 @@ class X12EDIConnection(SparkleConnection):
 
     Parses X12 837 (claims), 835 (remittance), 270/271 (eligibility) files.
 
-    Example config:
+    Example config (config/connections/x12_edi/prod.json):
+        {
+            "input_path": "s3://edi-inbox/837/",
+            "output_path": "s3://edi-processed/",
+            "transaction_set": "837",
+            "segment_terminator": "~",
+            "element_separator": "*",
+            "sub_element_separator": ":"
+        }
+
+    Example config (YAML):
         x12_edi_prod:
           type: x12_edi
           input_path: s3://edi-inbox/837/
@@ -362,7 +382,15 @@ class FIXProtocolConnection(SparkleConnection):
 
     Parses FIX protocol messages (4.2, 4.4, 5.0) used in trading systems.
 
-    Example config:
+    Example config (config/connections/fix_protocol/prod.json):
+        {
+            "log_path": "s3://trading-logs/fix/",
+            "fix_version": "FIX.4.4",
+            "sender_comp_id": "BROKER1",
+            "target_comp_id": "EXCHANGE1"
+        }
+
+    Example config (YAML):
         fix_prod:
           type: fix_protocol
           log_path: s3://trading-logs/fix/
@@ -489,7 +517,14 @@ class SWIFTConnection(SparkleConnection):
 
     Parses SWIFT MT (Message Type) and MX (ISO 20022 XML) messages.
 
-    Example config:
+    Example config (config/connections/swift/prod.json):
+        {
+            "message_format": "MT",
+            "input_path": "s3://swift-messages/mt103/",
+            "message_types": ["MT103", "MT202", "MT940"]
+        }
+
+    Example config (YAML):
         swift_prod:
           type: swift
           message_format: MT  # MT or MX
@@ -644,7 +679,15 @@ class AWSHealthLakeConnection(FHIRConnection):
     AWS HealthLake is a FHIR R4 compliant service for healthcare data.
     Extends FHIRConnection with AWS-specific authentication.
 
-    Example config:
+    Example config (config/connections/healthlake/prod.json):
+        {
+            "datastore_endpoint": "https://healthlake.us-east-1.amazonaws.com/datastore/abc123",
+            "region": "us-east-1",
+            "aws_access_key_id": "${AWS_ACCESS_KEY_ID}",
+            "aws_secret_access_key": "${AWS_SECRET_ACCESS_KEY}"
+        }
+
+    Example config (YAML):
         healthlake_prod:
           type: aws_healthlake
           datastore_endpoint: https://healthlake.us-east-1.amazonaws.com/datastore/abc123

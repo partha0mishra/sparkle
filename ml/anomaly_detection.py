@@ -18,6 +18,9 @@ class IsolationForestTrainer(BaseModelTrainer):
     """
     Isolation Forest for unsupervised anomaly detection.
 
+    Sub-Group: Anomaly & Fraud Detection
+    Tags: anomaly-detection, fraud, outliers, security
+
     Config example:
         {
             "train_table": "gold.transaction_features",
@@ -84,6 +87,9 @@ class OneClassSVMTrainer(BaseModelTrainer):
     """
     One-Class SVM for novelty detection.
 
+    Sub-Group: Anomaly & Fraud Detection
+    Tags: anomaly-detection, fraud, outliers, security
+
     Config example:
         {
             "train_table": "gold.normal_transactions",
@@ -136,6 +142,9 @@ class OneClassSVMTrainer(BaseModelTrainer):
 class AutoencoderAnomaly(BaseModelTrainer):
     """
     Autoencoder for anomaly detection via reconstruction error.
+
+    Sub-Group: Anomaly & Fraud Detection
+    Tags: anomaly-detection, fraud, outliers, security
 
     Config example:
         {
@@ -226,6 +235,9 @@ class ProphetAnomalyDetector(BaseModelTrainer):
     """
     Time-series anomaly detection using Prophet forecasting.
 
+    Sub-Group: Anomaly & Fraud Detection
+    Tags: anomaly-detection, fraud, outliers, security
+
     Config example:
         {
             "input_table": "gold.timeseries_metrics",
@@ -280,6 +292,9 @@ class TransactionRuleEngine(BaseModelTrainer):
     """
     Rule-based fraud detection engine.
 
+    Sub-Group: Anomaly & Fraud Detection
+    Tags: anomaly-detection, fraud, outliers, security
+
     Config example:
         {
             "input_table": "gold.transactions",
@@ -330,6 +345,9 @@ class GraphSAGEFraud(BaseModelTrainer):
     """
     Graph neural network for fraud detection.
 
+    Sub-Group: Anomaly & Fraud Detection
+    Tags: anomaly-detection, fraud, outliers, security
+
     Config example:
         {
             "nodes_table": "gold.transaction_nodes",
@@ -368,6 +386,9 @@ class GraphSAGEFraud(BaseModelTrainer):
 class VelocityLinkAnalysis(BaseModelTrainer):
     """
     Velocity checks and link analysis for fraud detection.
+
+    Sub-Group: Anomaly & Fraud Detection
+    Tags: anomaly-detection, fraud, outliers, security
 
     Config example:
         {
@@ -425,6 +446,9 @@ class VelocityLinkAnalysis(BaseModelTrainer):
 class DBSCANClustering(BaseModelTrainer):
     """
     DBSCAN clustering for outlier detection.
+
+    Sub-Group: Anomaly & Fraud Detection
+    Tags: anomaly-detection, fraud, outliers, security
 
     Config example:
         {
@@ -484,6 +508,9 @@ class DBSCANClustering(BaseModelTrainer):
 class SupervisedFraudTrainer(BaseModelTrainer):
     """
     Supervised fraud detection with class imbalance handling.
+
+    Sub-Group: Anomaly & Fraud Detection
+    Tags: anomaly-detection, fraud, outliers, security
 
     Config example:
         {
@@ -567,6 +594,9 @@ class AnomalyScoreCalibration(BaseModelTrainer):
     """
     Calibrate anomaly scores to probabilities.
 
+    Sub-Group: Anomaly & Fraud Detection
+    Tags: anomaly-detection, fraud, outliers, security
+
     Config example:
         {
             "scores_table": "gold.anomaly_scores",
@@ -621,6 +651,9 @@ class AnomalyScoreCalibration(BaseModelTrainer):
 class FraudCaseManager(BaseModelTrainer):
     """
     Manage fraud investigation cases and workflows.
+
+    Sub-Group: Anomaly & Fraud Detection
+    Tags: anomaly-detection, fraud, outliers, security
 
     Config example:
         {

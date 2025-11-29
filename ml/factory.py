@@ -123,3 +123,22 @@ class MLComponent:
     def register(name: str, component_class: Type[BaseMLComponent]) -> None:
         """Register a new ML component type."""
         MLComponentFactory.register(name, component_class)
+
+
+# Convenience function
+def get_ml_component(
+    name: str,
+    spark: Optional[SparkSession] = None,
+    env: str = "prod",
+    config: Optional[Dict[str, Any]] = None
+) -> BaseMLComponent:
+    """
+    Convenience function to create an ML component.
+    """
+    if spark is None:
+        try:
+            spark = SparkSession.builder.getOrCreate()
+        except Exception:
+            pass
+            
+    return MLComponentFactory.create(name, spark, env=env, config=config)

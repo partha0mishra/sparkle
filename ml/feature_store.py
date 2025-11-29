@@ -17,6 +17,9 @@ class FeatureTableWriter(BaseFeatureStoreComponent):
     """
     Writes DataFrame to Unity Catalog Feature Store table.
 
+    Sub-Group: Feature Store Integrations
+    Tags: feature-store, unity-catalog, features, mlops
+
     Config example:
         {
             "table_name": "customer_features",
@@ -80,6 +83,9 @@ class FeatureTableReader(BaseFeatureStoreComponent):
     """
     Reads features from Unity Catalog Feature Store.
 
+    Sub-Group: Feature Store Integrations
+    Tags: feature-store, unity-catalog, feature-lookup, point-in-time
+
     Supports point-in-time lookup or latest feature values.
 
     Config example:
@@ -126,6 +132,9 @@ class FeatureTableCreator(BaseFeatureStoreComponent):
     """
     Auto-creates Unity Catalog Feature Store table from DataFrame schema.
 
+    Sub-Group: Feature Store Integrations
+    Tags: feature-store, unity-catalog, schema, automation
+
     Config example:
         {
             "source_table": "gold.customer.enriched",
@@ -170,6 +179,9 @@ class FeatureViewMaterializer(BaseFeatureStoreComponent):
     """
     DLT-compatible daily materialization of feature views.
 
+    Sub-Group: Feature Store Integrations
+    Tags: feature-store, materialization, dlt, scheduling
+
     Config example:
         {
             "source_view": "silver.customer.customer_360",
@@ -206,6 +218,9 @@ class FeatureViewMaterializer(BaseFeatureStoreComponent):
 class FeatureOnlineStoreSync(BaseFeatureStoreComponent):
     """
     Pushes latest feature values to online store (Redis/DynamoDB/Rockset).
+
+    Sub-Group: Feature Store Integrations
+    Tags: feature-store, online-serving, redis, dynamodb, low-latency
 
     Config example:
         {
@@ -283,6 +298,9 @@ class FeatureDriftDetector(BaseFeatureStoreComponent):
     """
     Detects feature drift using PSI (Population Stability Index) or KS test.
 
+    Sub-Group: Feature Store Integrations
+    Tags: feature-drift, monitoring, psi, ks-test, alerting
+
     Config example:
         {
             "reference_table": "training_features_202501",
@@ -352,6 +370,9 @@ class FeatureDriftDetector(BaseFeatureStoreComponent):
 class FeatureImportanceLogger(BaseFeatureStoreComponent):
     """
     Logs feature importance (permutation or SHAP) to MLflow.
+
+    Sub-Group: Feature Store Integrations
+    Tags: feature-importance, shap, mlflow, explainability
 
     Config example:
         {
@@ -436,6 +457,9 @@ class FeatureImportanceLogger(BaseFeatureStoreComponent):
 class FeatureLineageTracker(BaseFeatureStoreComponent):
     """
     Emits OpenLineage events linking features → transformations → models.
+
+    Sub-Group: Feature Store Integrations
+    Tags: lineage, openlineage, governance, data-quality
 
     Config example:
         {

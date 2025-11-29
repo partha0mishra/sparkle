@@ -29,6 +29,9 @@ class PolynomialFeatures(BaseFeatureEngineer):
     """
     Generate polynomial and interaction features up to degree N.
 
+    Sub-Group: Feature Engineering Transformers
+    Tags: feature-engineering, polynomial, interactions, transformers
+
     Config example:
         {
             "input_table": "silver.features.base",
@@ -63,6 +66,9 @@ class Bucketizer(BaseFeatureEngineer):
     """
     Discretize continuous features into buckets/bins.
 
+    Sub-Group: Feature Engineering Transformers
+    Tags: feature-engineering, binning, discretization, bucketing
+
     Config example:
         {
             "input_table": "silver.features.base",
@@ -91,6 +97,9 @@ class Bucketizer(BaseFeatureEngineer):
 class OneHotEncoder(BaseFeatureEngineer):
     """
     One-hot encode categorical features.
+
+    Sub-Group: Feature Engineering Transformers
+    Tags: feature-engineering, encoding, categorical, one-hot
 
     Config example:
         {
@@ -133,6 +142,9 @@ class OneHotEncoder(BaseFeatureEngineer):
 class TargetEncoder(BaseFeatureEngineer):
     """
     Target encoding with smoothing and regularization.
+
+    Sub-Group: Feature Engineering Transformers
+    Tags: feature-engineering, encoding, target-encoding, categorical
 
     Config example:
         {
@@ -188,6 +200,9 @@ class FrequencyEncoder(BaseFeatureEngineer):
     """
     Encode categorical features by their frequency.
 
+    Sub-Group: Feature Engineering Transformers
+    Tags: feature-engineering, encoding, frequency, categorical
+
     Config example:
         {
             "input_table": "silver.features.base",
@@ -229,6 +244,9 @@ class HashingTrickFeatureHasher(BaseFeatureEngineer):
     """
     Feature hashing for high-cardinality categoricals.
 
+    Sub-Group: Feature Engineering Transformers
+    Tags: feature-engineering, hashing, dimensionality-reduction, sparse
+
     Config example:
         {
             "input_table": "silver.features.base",
@@ -264,6 +282,9 @@ class HashingTrickFeatureHasher(BaseFeatureEngineer):
 class CountVectorizer(BaseFeatureEngineer):
     """
     Convert text to token counts (bag of words).
+
+    Sub-Group: Feature Engineering Transformers
+    Tags: feature-engineering, nlp, text, bag-of-words
 
     Config example:
         {
@@ -303,6 +324,9 @@ class TFIDFTransformer(BaseFeatureEngineer):
     """
     Transform count vectors to TF-IDF.
 
+    Sub-Group: Feature Engineering Transformers
+    Tags: feature-engineering, nlp, text, tfidf
+
     Config example:
         {
             "input_table": "silver.text.count_vectorized",
@@ -329,6 +353,9 @@ class TFIDFTransformer(BaseFeatureEngineer):
 class Word2VecEmbeddings(BaseFeatureEngineer):
     """
     Train Word2Vec embeddings on tokenized text.
+
+    Sub-Group: Feature Engineering Transformers
+    Tags: feature-engineering, nlp, embeddings, word2vec
 
     Config example:
         {
@@ -374,6 +401,9 @@ class Word2VecEmbeddings(BaseFeatureEngineer):
 class BERTSentenceEmbeddings(BaseFeatureEngineer):
     """
     Generate BERT sentence embeddings using Spark NLP.
+
+    Sub-Group: Feature Engineering Transformers
+    Tags: feature-engineering, nlp, embeddings, bert, transformers
 
     Config example:
         {
@@ -425,6 +455,9 @@ class SQLFeatureTransformer(BaseFeatureEngineer):
     """
     Apply arbitrary SQL transformations for feature engineering.
 
+    Sub-Group: Feature Engineering Transformers
+    Tags: feature-engineering, sql, custom, transformations
+
     Config example:
         {
             "input_table": "silver.features.base",
@@ -455,6 +488,9 @@ class SQLFeatureTransformer(BaseFeatureEngineer):
 class RollingWindowFeatures(BaseFeatureEngineer):
     """
     Calculate rolling window statistics (mean, sum, std, min, max).
+
+    Sub-Group: Feature Engineering Transformers
+    Tags: feature-engineering, time-series, windows, aggregations
 
     Config example:
         {
@@ -512,6 +548,9 @@ class RollingWindowFeatures(BaseFeatureEngineer):
 class TimeSinceEventFeatures(BaseFeatureEngineer):
     """
     Calculate time elapsed since last event per entity.
+
+    Sub-Group: Feature Engineering Transformers
+    Tags: feature-engineering, time-series, events, temporal
 
     Config example:
         {
@@ -571,6 +610,9 @@ class RatioFeatures(BaseFeatureEngineer):
     """
     Create ratio features between numeric columns.
 
+    Sub-Group: Feature Engineering Transformers
+    Tags: feature-engineering, ratios, derived, calculations
+
     Config example:
         {
             "input_table": "silver.features.base",
@@ -618,6 +660,9 @@ class InteractionFeatures(BaseFeatureEngineer):
     """
     Create multiplicative interaction features.
 
+    Sub-Group: Feature Engineering Transformers
+    Tags: feature-engineering, interactions, combinations, derived
+
     Config example:
         {
             "input_table": "silver.features.base",
@@ -653,6 +698,9 @@ class InteractionFeatures(BaseFeatureEngineer):
 class CyclicalDateTimeFeatures(BaseFeatureEngineer):
     """
     Encode cyclical time features using sin/cos transformations.
+
+    Sub-Group: Feature Engineering Transformers
+    Tags: feature-engineering, datetime, cyclical, trigonometric
 
     Config example:
         {
@@ -711,6 +759,9 @@ class HaversineDistanceFeature(BaseFeatureEngineer):
     """
     Calculate haversine distance between two lat/lon points.
 
+    Sub-Group: Feature Engineering Transformers
+    Tags: feature-engineering, geospatial, distance, haversine
+
     Config example:
         {
             "input_table": "silver.features.locations",
@@ -754,6 +805,9 @@ class GeohashGridFeatures(BaseFeatureEngineer):
     """
     Create geohash grid features from lat/lon.
 
+    Sub-Group: Feature Engineering Transformers
+    Tags: feature-engineering, geospatial, geohash, location
+
     Config example:
         {
             "input_table": "silver.features.locations",
@@ -793,6 +847,9 @@ class MissingIndicator(BaseFeatureEngineer):
     """
     Create binary indicator features for missing values.
 
+    Sub-Group: Feature Engineering Transformers
+    Tags: feature-engineering, missing-data, indicators, imputation
+
     Config example:
         {
             "input_table": "silver.features.base",
@@ -822,6 +879,9 @@ class MissingIndicator(BaseFeatureEngineer):
 class OutlierCapper(BaseFeatureEngineer):
     """
     Cap outliers using IQR or percentile method.
+
+    Sub-Group: Feature Engineering Transformers
+    Tags: feature-engineering, outliers, winsorization, capping
 
     Config example:
         {
@@ -886,6 +946,9 @@ class SkewnessCorrector(BaseFeatureEngineer):
     """
     Correct skewed distributions using log/sqrt/box-cox transforms.
 
+    Sub-Group: Feature Engineering Transformers
+    Tags: feature-engineering, normalization, skewness, transformations
+
     Config example:
         {
             "input_table": "silver.features.base",
@@ -930,6 +993,9 @@ class SkewnessCorrector(BaseFeatureEngineer):
 class RobustScaler(BaseFeatureEngineer):
     """
     Scale features using median and IQR (robust to outliers).
+
+    Sub-Group: Feature Engineering Transformers
+    Tags: feature-engineering, scaling, normalization, robust
 
     Config example:
         {

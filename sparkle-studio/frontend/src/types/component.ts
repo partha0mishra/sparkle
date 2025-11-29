@@ -2,7 +2,7 @@
  * Component type definitions matching backend Phase 2 schemas.
  */
 
-export type ComponentCategory = 'connection' | 'ingestor' | 'transformer' | 'ml' | 'sink';
+export type ComponentCategory = 'connection' | 'ingestor' | 'transformer' | 'ml' | 'orchestrator' | 'sink';
 
 export interface ComponentMetadata {
   name: string;

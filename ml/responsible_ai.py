@@ -18,6 +18,9 @@ class BiasFairnessAuditor(BaseMLComponent):
     """
     Audit model predictions for bias across protected attributes.
 
+    Sub-Group: Responsible AI & Governance
+    Tags: governance, fairness, bias, explainability
+
     Config example:
         {
             "predictions_table": "gold.model_predictions",
@@ -83,6 +86,9 @@ class BiasFairnessAuditor(BaseMLComponent):
 class FairnessReweighting(BaseMLComponent):
     """
     Reweight training data to improve fairness.
+
+    Sub-Group: Responsible AI & Governance
+    Tags: governance, fairness, bias, explainability
 
     Config example:
         {
@@ -151,6 +157,9 @@ class SHAPSegmentExplainability(BaseMLComponent):
     """
     Generate SHAP explanations per customer segment.
 
+    Sub-Group: Responsible AI & Governance
+    Tags: governance, fairness, bias, explainability
+
     Config example:
         {
             "input_table": "gold.predictions",
@@ -212,6 +221,9 @@ class SHAPSegmentExplainability(BaseMLComponent):
 class ModelCardGenerator(BaseMLComponent):
     """
     Generate model cards documenting model details, performance, and limitations.
+
+    Sub-Group: Responsible AI & Governance
+    Tags: governance, fairness, bias, explainability
 
     Config example:
         {
@@ -283,6 +295,9 @@ class PIIFeatureRedactor(BaseMLComponent):
     """
     Redact or encrypt PII features before model training.
 
+    Sub-Group: Responsible AI & Governance
+    Tags: governance, fairness, bias, explainability
+
     Config example:
         {
             "input_table": "gold.customer_data",
@@ -352,6 +367,9 @@ class PIIFeatureRedactor(BaseMLComponent):
 class ModelRiskTierClassifier(BaseMLComponent):
     """
     Classify models into risk tiers based on impact and usage.
+
+    Sub-Group: Responsible AI & Governance
+    Tags: governance, fairness, bias, explainability
 
     Config example:
         {
@@ -425,6 +443,9 @@ class ModelInventoryRegistry(BaseMLComponent):
     """
     Maintain central registry of all production models.
 
+    Sub-Group: Responsible AI & Governance
+    Tags: governance, fairness, bias, explainability
+
     Config example:
         {
             "inventory_table": "audit.model_inventory",
@@ -481,6 +502,9 @@ class ModelInventoryRegistry(BaseMLComponent):
 class ModelRetirementWorkflow(BaseMLComponent):
     """
     Manage model retirement lifecycle and decommissioning.
+
+    Sub-Group: Responsible AI & Governance
+    Tags: governance, fairness, bias, explainability
 
     Config example:
         {

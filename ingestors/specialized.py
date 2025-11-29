@@ -15,7 +15,10 @@ from .factory import register_ingestor
 class Hl7FhirBundleIngestion(BaseBatchIngestor):
     """
     HL7 FHIR Bundle JSON -> flattened resources.
-    
+
+    Sub-Group: Specialized / Industry
+    Tags: hl7, fhir, healthcare, bundle, json
+
     Config example:
         {
             "source_name": "fhir_patients",
@@ -58,7 +61,10 @@ class Hl7FhirBundleIngestion(BaseBatchIngestor):
 class X12Edi837835Ingestion(BaseBatchIngestor):
     """
     Healthcare claims X12 EDI 837/835 -> loops & segments.
-    
+
+    Sub-Group: Specialized / Industry
+    Tags: x12, edi, healthcare, claims, 837, 835
+
     Config example:
         {
             "source_name": "edi_claims",
@@ -96,7 +102,10 @@ class X12Edi837835Ingestion(BaseBatchIngestor):
 class FixProtocolLogIngestion(BaseBatchIngestor):
     """
     FIX 4.4+ protocol logs -> structured messages.
-    
+
+    Sub-Group: Specialized / Industry
+    Tags: fix, protocol, financial, trading, messaging
+
     Config example:
         {
             "source_name": "fix_logs",
@@ -130,7 +139,10 @@ class FixProtocolLogIngestion(BaseBatchIngestor):
 class SwiftMtMxIso20022Ingestion(BaseBatchIngestor):
     """
     SWIFT MT/MX messages -> field-level parsing.
-    
+
+    Sub-Group: Specialized / Industry
+    Tags: swift, mt, mx, iso20022, financial, banking
+
     Config example:
         {
             "source_name": "swift_messages",

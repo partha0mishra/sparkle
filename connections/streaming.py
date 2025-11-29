@@ -5,7 +5,7 @@ Supports: Kafka, AWS Kinesis, Azure Event Hubs, Google Pub/Sub,
 Apache Pulsar, RabbitMQ, Amazon SQS, Azure Service Bus.
 """
 
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 from pyspark.sql import SparkSession, DataFrame
 
 from .base import StreamingConnection
@@ -518,10 +518,20 @@ class MQTTConnection(StreamingConnection):
     """
     MQTT (Message Queuing Telemetry Transport) connection for IoT streaming.
     Sub-Group: Streaming & Messaging
-    
+
     Uses Bahir MQTT connector or Kafka bridge pattern.
-    
-    Example config:
+
+    Example config (config/connections/mqtt/prod.json):
+        {
+            "broker_url": "tcp://mqtt.example.com:1883",
+            "username": "${MQTT_USERNAME}",
+            "password": "${MQTT_PASSWORD}",
+            "client_id": "sparkle-mqtt-client",
+            "qos": 1,
+            "clean_session": true
+        }
+
+    Example config (YAML):
         mqtt_prod:
           type: mqtt
           broker_url: tcp://mqtt.example.com:1883
@@ -695,11 +705,22 @@ class NATSJetStreamConnection(StreamingConnection):
     """
     NATS JetStream connection for cloud-native messaging.
     Sub-Group: Streaming & Messaging
-    
+
     NATS is a simple, secure, and high-performance messaging system.
     JetStream adds streaming, persistence, and exactly-once semantics.
-    
-    Example config:
+
+    Example config (config/connections/nats/prod.json):
+        {
+            "servers": "nats://nats1.example.com:4222,nats://nats2.example.com:4222",
+            "username": "${NATS_USERNAME}",
+            "password": "${NATS_PASSWORD}",
+            "stream_name": "EVENTS",
+            "subject": "events.>",
+            "durable_name": "sparkle-consumer",
+            "tls_enabled": true
+        }
+
+    Example config (YAML):
         nats_prod:
           type: nats_jetstream
           servers: nats://nats1.example.com:4222,nats://nats2.example.com:4222

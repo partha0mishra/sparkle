@@ -16,9 +16,12 @@ import re
 class PartitionedParquetIngestion(BaseBatchIngestor):
     """
     Discovers and loads new Hive-style partitions (year=2025/month=11/day=19).
-    
+
+    Sub-Group: File & Object Storage
+    Tags: parquet, hive, partitioned, incremental
+
     Tracks last partition watermark and only loads newer partitions.
-    
+
     Config example:
         {
             "source_name": "partitioned_data",
@@ -49,7 +52,10 @@ class PartitionedParquetIngestion(BaseBatchIngestor):
 class DailyFileDropIngestion(BaseBatchIngestor):
     """
     Loads daily files with date patterns (events_20251119.csv).
-    
+
+    Sub-Group: File & Object Storage
+    Tags: csv, daily, file-drop, date-pattern
+
     Config example:
         {
             "source_name": "daily_files",
@@ -98,7 +104,10 @@ class DailyFileDropIngestion(BaseBatchIngestor):
 class IncrementalFileByModifiedTime(BaseBatchIngestor):
     """
     Uses S3/ADLS/GCS lastModified to load only newer files.
-    
+
+    Sub-Group: File & Object Storage
+    Tags: s3, gcs, azure, incremental, metadata
+
     Config example:
         {
             "source_name": "modified_files",
@@ -133,7 +142,10 @@ class IncrementalFileByModifiedTime(BaseBatchIngestor):
 class AppendOnlyJsonNdjsonIngestion(BaseBatchIngestor):
     """
     Loads newline-delimited JSON with schema evolution.
-    
+
+    Sub-Group: File & Object Storage
+    Tags: json, ndjson, schema-evolution, append-only
+
     Config example:
         {
             "source_name": "ndjson_data",
@@ -156,9 +168,12 @@ class AppendOnlyJsonNdjsonIngestion(BaseBatchIngestor):
 class CopybookEbcdicMainframeIngestion(BaseBatchIngestor):
     """
     Loads EBCDIC files with COBOL copybook schema.
-    
+
+    Sub-Group: File & Object Storage
+    Tags: ebcdic, mainframe, cobol, copybook
+
     Uses Cobrix library for parsing.
-    
+
     Config example:
         {
             "source_name": "mainframe_data",
@@ -191,7 +206,10 @@ class CopybookEbcdicMainframeIngestion(BaseBatchIngestor):
 class FixedWidthWithDremelIngestion(BaseBatchIngestor):
     """
     Parses fixed-width files with Dremel-style record descriptors.
-    
+
+    Sub-Group: File & Object Storage
+    Tags: fixed-width, dremel, parsing, legacy
+
     Config example:
         {
             "source_name": "fixed_width",
@@ -236,7 +254,10 @@ class FixedWidthWithDremelIngestion(BaseBatchIngestor):
 class IncrementalAvroIngestion(BaseBatchIngestor):
     """
     Loads Avro files with Schema Registry compatibility.
-    
+
+    Sub-Group: File & Object Storage
+    Tags: avro, schema-registry, incremental
+
     Config example:
         {
             "source_name": "avro_data",
@@ -263,7 +284,10 @@ class IncrementalAvroIngestion(BaseBatchIngestor):
 class DeltaTableAsSourceIngestion(BaseBatchIngestor):
     """
     Reads Delta table as source (cross-catalog replication).
-    
+
+    Sub-Group: File & Object Storage
+    Tags: delta, cross-catalog, replication, incremental
+
     Config example:
         {
             "source_name": "source_delta",
@@ -296,7 +320,10 @@ class DeltaTableAsSourceIngestion(BaseBatchIngestor):
 class IcebergTableAsSourceIngestion(BaseBatchIngestor):
     """
     Reads Apache Iceberg table with snapshot or incremental.
-    
+
+    Sub-Group: File & Object Storage
+    Tags: iceberg, snapshot, incremental, apache
+
     Config example:
         {
             "source_name": "iceberg_source",

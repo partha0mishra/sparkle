@@ -15,7 +15,10 @@ from .factory import register_ingestor
 class DebeziumKafkaCdcIngestion(BaseCdcIngestor):
     """
     Debezium CDC from Kafka with op + before/after.
-    
+
+    Sub-Group: Change Data Capture (CDC)
+    Tags: debezium, kafka, cdc, change-tracking, streaming
+
     Config example:
         {
             "source_name": "debezium_customers",
@@ -62,7 +65,10 @@ class DebeziumKafkaCdcIngestion(BaseCdcIngestor):
 class KafkaConnectJdbcSourceIncremental(BaseCdcIngestor):
     """
     Kafka Connect JDBC Source incremental snapshots.
-    
+
+    Sub-Group: Change Data Capture (CDC)
+    Tags: kafka-connect, jdbc, incremental, snapshot
+
     Config example:
         {
             "source_name": "jdbc_cdc_orders",
@@ -93,7 +99,10 @@ class KafkaConnectJdbcSourceIncremental(BaseCdcIngestor):
 class KafkaConnectMongoSourceCdc(BaseCdcIngestor):
     """
     MongoDB oplog via Kafka Connect.
-    
+
+    Sub-Group: Change Data Capture (CDC)
+    Tags: mongodb, kafka-connect, oplog, cdc, nosql
+
     Config example:
         {
             "source_name": "mongo_cdc_users",
@@ -124,7 +133,10 @@ class KafkaConnectMongoSourceCdc(BaseCdcIngestor):
 class PostgresLogicalReplicationDirect(BaseStreamingIngestor):
     """
     Postgres logical replication via pgoutput/wal2json.
-    
+
+    Sub-Group: Change Data Capture (CDC)
+    Tags: postgres, logical-replication, pgoutput, wal2json, streaming
+
     Config example:
         {
             "source_name": "postgres_replication",
@@ -148,7 +160,10 @@ class PostgresLogicalReplicationDirect(BaseStreamingIngestor):
 class OracleGoldenGateKafkaCdc(BaseCdcIngestor):
     """
     Oracle GoldenGate -> Kafka -> Delta.
-    
+
+    Sub-Group: Change Data Capture (CDC)
+    Tags: oracle, goldengate, kafka, cdc, enterprise
+
     Config example:
         {
             "source_name": "goldengate_orders",
@@ -180,7 +195,10 @@ class OracleGoldenGateKafkaCdc(BaseCdcIngestor):
 class SqlServerCdcViaDebezium(BaseCdcIngestor):
     """
     SQL Server CDC via Debezium.
-    
+
+    Sub-Group: Change Data Capture (CDC)
+    Tags: sqlserver, debezium, cdc, mssql
+
     Config example:
         {
             "source_name": "sqlserver_cdc_products",
@@ -210,7 +228,10 @@ class SqlServerCdcViaDebezium(BaseCdcIngestor):
 class MySqlBinlogDirect(BaseCdcIngestor):
     """
     MySQL binlog via Maxwell or Debezium.
-    
+
+    Sub-Group: Change Data Capture (CDC)
+    Tags: mysql, binlog, maxwell, debezium, cdc
+
     Config example:
         {
             "source_name": "mysql_binlog_customers",
@@ -243,7 +264,10 @@ class MySqlBinlogDirect(BaseCdcIngestor):
 class SnowflakeStreamIngestion(BaseCdcIngestor):
     """
     Snowflake STREAM with MERGE logic.
-    
+
+    Sub-Group: Change Data Capture (CDC)
+    Tags: snowflake, stream, cdc, cloud-warehouse
+
     Config example:
         {
             "source_name": "snowflake_stream_orders",
@@ -278,7 +302,10 @@ class SnowflakeStreamIngestion(BaseCdcIngestor):
 class BigQueryChangeStreamIngestion(BaseCdcIngestor):
     """
     BigQuery change streams.
-    
+
+    Sub-Group: Change Data Capture (CDC)
+    Tags: bigquery, change-stream, cdc, gcp
+
     Config example:
         {
             "source_name": "bq_changestream_events",
@@ -310,7 +337,10 @@ class BigQueryChangeStreamIngestion(BaseCdcIngestor):
 class DynamoDbStreamsToDelta(BaseCdcIngestor):
     """
     DynamoDB Streams -> Delta.
-    
+
+    Sub-Group: Change Data Capture (CDC)
+    Tags: dynamodb, streams, cdc, aws, nosql
+
     Config example:
         {
             "source_name": "dynamodb_stream_items",
@@ -336,7 +366,10 @@ class DynamoDbStreamsToDelta(BaseCdcIngestor):
 class MongoDbChangeStreamsToDelta(BaseStreamingIngestor):
     """
     MongoDB 4.0+ change streams.
-    
+
+    Sub-Group: Change Data Capture (CDC)
+    Tags: mongodb, change-streams, streaming, nosql, cdc
+
     Config example:
         {
             "source_name": "mongo_changestream_orders",
@@ -371,7 +404,10 @@ class MongoDbChangeStreamsToDelta(BaseStreamingIngestor):
 class PostgresCdcViaDebezium(BaseCdcIngestor):
     """
     PostgreSQL CDC via Debezium -> Kafka.
-    
+
+    Sub-Group: Change Data Capture (CDC)
+    Tags: postgres, debezium, kafka, cdc, postgresql
+
     Config example:
         {
             "source_name": "postgres_cdc_accounts",

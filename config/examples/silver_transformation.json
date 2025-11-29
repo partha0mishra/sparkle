@@ -1,0 +1,26 @@
+{
+    "pipeline_name": "customer_silver_cleaning",
+    "pipeline_type": "SilverBatchTransformationPipeline",
+    "env": "prod",
+    "source_table": "sparkle_prod.bronze_salesforce.customers",
+    "destination_catalog": "sparkle_prod",
+    "destination_schema": "silver_sales",
+    "destination_table": "customers",
+    "write_mode": "merge",
+    "primary_key": [
+        "id"
+    ],
+    "transformers": [
+        {
+            "name": "clean_column_names",
+            "params": {}
+        },
+        {
+            "name": "cast_columns",
+            "params": {
+                "created_date": "timestamp"
+            }
+        }
+    ],
+    "expectations_suite": "customer_silver_suite"
+}
